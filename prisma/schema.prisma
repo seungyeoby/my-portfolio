@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+model ItemCondition{
+  itemConditionId Int @id @default(autoincrement()) @map("item_condition_id")
+  itemId Int @map("item_id")
+  conditionValue String @map("condition_value")
+  item Item @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+  @@map("item_conditions")
+}
+model Item{
+  itemId Int @id @default(autoincrement()) @map("item_id")
+  categoryId Int @map("category_id")
+  itemLabel String @map("item_label")
+  clickCount Int @map("click_count")
+  itemCategory ItemCategory @relation(fields: [categoryId], references: [categoryId])
+  itemConditions ItemCondition[]
+  checklistItems ChecklistItem[]
+  itemReviews ItemReview[]
+  @@map("items")
+}
+model ItemCategory{
+  categoryId Int @id @default(autoincrement()) @map("category_id")
+  categoryLabel String @unique @map("category_label")
+  items Item[]
+  @@map("item_category")
+}
+model ChecklistItem{
+  checklistItemId Int @id @default(autoincrement()) @map("checklist_item_id")
+  checklistId Int @map("checklist_id")
+  itemId Int @map("item_id")
+  removedByUser Boolean @default(false) @map("removed_by_user")
+  packingBag PackingBag @default(HOLD) @map("packing_bag")
+  item Item @relation(fields: [itemId], references: [itemId])
+  checklist Checklist @relation(fields: [checklistId], references: [checklistId], onDelete: Cascade)
+  @@map("checklist_items")
+}
+enum PackingBag {
+  HAND
+  HOLD
+}
+model Checklist{
+  checklistId Int @id @default(autoincrement()) @map("checklist_id")
+  userId Int @map("user_id")
+  title String @map("title")
+  travelType TravelType @default(ACTIVITY) @map("travel_type")
+  cityId Int @map("city_id")
+  travelStart DateTime @db.Date @map("travel_start")
+  travelEnd DateTime @db.Date @map("travel_end")
+  createdAt DateTime @default(now()) @map("created_at")
+  isShared Boolean @default(false) @map("is_shared")
+  likes Int @default(0) @map("likes")
+  content String? @map("content")
+  updatedAt DateTime @updatedAt @db.DateTime @map("updated_at")
+  deletedAt DateTime? @db.DateTime @map("deleted_at")
+  checklistItems ChecklistItem[]
+  cities City @relation(fields: [cityId], references: [cityId])
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  itemReviews ItemReview[]
+  @@map("checklists")
+}
+enum TravelType{
+  ACTIVITY
+  RECREATION
+  EXPLORATION
+  BUSINESS
+}
+model User{
+  userId Int @id @default(autoincrement()) @map("user_id")
+  nickname String @unique @map("nickname")
+  email String @unique @map("email")
+  password String @map("password")
+  birthDate DateTime @db.Date @map("birth_date")
+  profilePhoto String? @map("profile_photo")
+  gender Gender @map("gender")
+  authority Authority @map("authority")
+  checklists Checklist[]
+  itemReviews ItemReview[]
+  favoriteItemReviews UserFavoriteItemReview[]
+  @@map("users")
+}
+enum Gender {
+  MALE
+  FEMALE
+  NONSPECIFIED
+}
+enum Authority {
+  USER
+  ADMIN
+}
+model ItemReview{
+  reviewId Int @id @default(autoincrement()) @map("review_id")
+  userId Int @map("user_id")
+  title String @map("title")
+  checklistId Int @map("checklist_id")
+  content String @db.Text @map("content")
+  image String? @map("image")
+  likes Int @default(0) @map("likes")
+  itemId Int @map("item_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  deletedAt DateTime? @db.DateTime @map("deleted_at")
+  checklist Checklist @relation(fields: [checklistId], references: [checklistId])
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [itemId])
+  favoriteItemReviews UserFavoriteItemReview[]
+  @@map("item_reviews")
+}
+model UserFavoriteItemReview{
+  favoriteId Int @id @default(autoincrement()) @map("favorite_id")
+  userId Int @map("user_id")
+  reviewId Int @map("review_id")
+  favoritedAt DateTime @default(now()) @map("favorited_at")
+  deletedAt DateTime? @db.DateTime @map("deleted_at")
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  itemReview ItemReview @relation(fields: [reviewId], references: [reviewId])
+  @@unique([userId, reviewId])
+  @@map("user_favorite_item_reviews")
+}
+model TravelTip{
+  tipId Int @id @default(autoincrement()) @map("tip_id")
+  title String @map("title")
+  content String @db.Text @map("content")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("travel_tips")
+}
+model City{
+  cityId Int @id @default(autoincrement()) @map("city_id")
+  cityName String @map("city_name")
+  checklist Checklist[]
+  @@map("cities")
+}
