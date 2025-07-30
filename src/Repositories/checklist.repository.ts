@@ -1,7 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { Prisma } from "@prisma/client";
 import { Checklist, Item } from "../types/checklist.js";
-import { check } from "express-validator";
 
 class ChecklistRepository {
   async saveChecklist(items: Item[], checklistInfo: Omit<Checklist, "items">) {
@@ -49,6 +48,24 @@ class ChecklistRepository {
         await tx.checklistItem.deleteMany({
           where: { checklistId },
         });
+      });
+    } catch (e) {
+      throw new Error("DatabaseError");
+    }
+  }
+
+  async getChecklistsByUserId(userId: number) {
+    try {
+      return await prisma.checklist.findMany({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+        omit: {
+          isShared: true,
+          likes: true,
+          updatedAt: true,
+        },
       });
     } catch (e) {
       throw new Error("DatabaseError");
