@@ -6,6 +6,10 @@ class userService {
     const { items, ...checklistInfo } = checklist;
     await checklistRepository.saveChecklist(items, checklistInfo);
   }
+
+  async deleteChecklist(checklistId: number) {
+    await checklistRepository.deleteChecklist(checklistId);
+  }
 }
 
 export default new userService();
