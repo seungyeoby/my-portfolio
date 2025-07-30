@@ -1,23 +1,6 @@
-import prisma from "../utils/prisma/index.js";
+import prisma from "../lib/prisma.js";
 
 class ItemsRepository {
-  async getItems() {
-    try {
-      return await prisma.itemCategory.findMany({
-        include: {
-          items: {
-            select: {
-              itemId: true,
-              itemLabel: true,
-            },
-          },
-        },
-      });
-    } catch (e) {
-      throw new Error("DataBaseError");
-    }
-  }
-
   async getItemsByClickCountDesc() {
     try {
       return await prisma.item.findMany({
@@ -38,4 +21,4 @@ class ItemsRepository {
   }
 }
 
-export default new ItemsRepository();
+export default ItemsRepository;

@@ -1,9 +1,18 @@
 import ItemsRepository from "../Repositories/items.repository.js";
+import ItemCategoryRepository from "../Repositories/itemCategory.repository.js";
 import { Item, Items } from "../types/Items.js";
 
 class ItemService {
+  private itemRepo: ItemsRepository;
+  private itemCategoryRepo: ItemCategoryRepository;
+
+  constructor() {
+    this.itemRepo = new ItemsRepository();
+    this.itemCategoryRepo = new ItemCategoryRepository();
+  }
+
   async getWholeItems() {
-    const wholeItems = await ItemsRepository.getItems();
+    const wholeItems = await this.itemCategoryRepo.getItems();
     const res = wholeItems.sort(
       (a: Items, b: Items) => a.categoryId - b.categoryId
     );
@@ -11,7 +20,7 @@ class ItemService {
   }
 
   async getItemsByClickCountDesc() {
-    const items: Item[] = await ItemsRepository.getItemsByClickCountDesc();
+    const items: Item[] = await this.itemRepo.getItemsByClickCountDesc();
     const res = items.map(({ itemLabel, clickCount }) => ({
       itemLabel,
       clickCount,
