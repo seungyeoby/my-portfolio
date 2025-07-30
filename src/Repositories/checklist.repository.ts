@@ -36,17 +36,18 @@ class ChecklistRepository {
   async deleteChecklist(checklistId: number) {
     try {
       await prisma.$transaction(async (tx) => {
-        // 1. checklist soft-delete (deleted_at 업데이트)
         await tx.checklist.update({
           where: { checklistId },
           data: {
-            deletedAt: new Date(), // 현재 시간 기록
+            deletedAt: new Date(),
           },
         });
 
-        // 2. checklistItem 하드 삭제
-        await tx.checklistItem.deleteMany({
+        await tx.checklistItem.updateMany({
           where: { checklistId },
+          data: {
+            deletedAt: new Date(),
+          },
         });
       });
     } catch (e) {

@@ -39,6 +39,8 @@ model ChecklistItem{
   itemId Int @map("item_id")
   removedByUser Boolean @default(false) @map("removed_by_user")
   packingBag PackingBag @default(HOLD) @map("packing_bag")
+  deletedAt DateTime? @db.DateTime @map("deleted_at")
+
   item Item @relation(fields: [itemId], references: [itemId])
   checklist Checklist @relation(fields: [checklistId], references: [checklistId], onDelete: Cascade)
   @@map("checklist_items")
