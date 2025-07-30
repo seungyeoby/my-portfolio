@@ -34,7 +34,9 @@ router.get(
 router.post("/checklists", userController.createChecklist);
 
 // 체크리스트 수정
+router.patch("/checklists/:checklistId", userController.updateChecklist);
 
 // 체크리스트 삭제
 router.delete("/checklists/:checklistId", userController.deleteChecklist);
+
 export default router;

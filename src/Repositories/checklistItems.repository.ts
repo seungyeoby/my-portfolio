@@ -6,6 +6,7 @@ class ChecklistItemsRepository {
       return await prisma.checklistItem.findMany({
         where: { checklistId, removedByUser: false },
         select: {
+          checklistItemId: true,
           packingBag: true,
           item: {
             select: {

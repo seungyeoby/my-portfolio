@@ -1,28 +1,36 @@
-import checklistRepository from "../Repositories/checklist.repository.js";
-import reviewsRepository from "../Repositories/reviews.repository.js";
-import checklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import ChecklistRepository from "../Repositories/checklist.repository.js";
+import ReviewsRepository from "../Repositories/reviews.repository.js";
+import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import prisma from "../lib/prisma.js";
 import { Checklist } from "../types/checklist.js";
 
 class userService {
+  private checklistRepo: ChecklistRepository;
+  private reviewRepo: ReviewsRepository;
+  private checklistItemsRepo: ChecklistItemsRepository;
+
+  constructor() {
+    this.checklistRepo = new ChecklistRepository();
+    this.reviewRepo = new ReviewsRepository();
+    this.checklistItemsRepo = new ChecklistItemsRepository();
+  }
+
   async createChecklist(checklist: Checklist) {
     const { items, ...checklistInfo } = checklist;
-    await checklistRepository.saveChecklist(items, checklistInfo);
+    await this.checklistRepo.saveChecklist(items, checklistInfo);
   }
 
   async deleteChecklist(checklistId: number) {
-    await checklistRepository.deleteChecklist(checklistId);
+    await this.checklistRepo.deleteChecklist(checklistId);
   }
 
   async getAllReviewsByUserId(userId: number) {
-    const reviews = await reviewsRepository.getAllReviewsByUserId(userId);
+    const reviews = await this.reviewRepo.getAllReviewsByUserId(userId);
     return reviews;
   }
 
   async getReviewByReviewId(userId: number, reviewId: number) {
-    const review = await reviewsRepository.getReviewByReviewId(
-      userId,
-      reviewId
-    );
+    const review = await this.reviewRepo.getReviewByReviewId(userId, reviewId);
     if (!review) {
       throw new Error("NotFound");
     }
@@ -30,12 +38,12 @@ class userService {
   }
 
   async getChecklistsByUserId(userId: number) {
-    const checklists = await checklistRepository.getChecklistsByUserId(userId);
+    const checklists = await this.checklistRepo.getChecklistsByUserId(userId);
     return checklists;
   }
 
   async getChecklistByReviewId(userId: number, checklistId: number) {
-    const checklist = await checklistRepository.getChecklistByChecklistId(
+    const checklist = await this.checklistRepo.getChecklistByChecklistId(
       userId,
       checklistId
     );
@@ -50,7 +58,7 @@ class userService {
       city: cities.cityName,
     };
 
-    const items = await checklistItemsRepository.getChecklistItems(checklistId);
+    const items = await this.checklistItemsRepo.getChecklistItems(checklistId);
     const itemRes = items.map((item) => ({
       itemLabel: item.item.itemLabel,
       packingBag: item.packingBag,
@@ -61,14 +69,14 @@ class userService {
   }
 
   async getSharedChecklists(userId: number) {
-    const checklists = await checklistRepository.getSharedChecklistsByUserId(
+    const checklists = await this.checklistRepo.getSharedChecklistsByUserId(
       userId
     );
     return checklists;
   }
 
   async getSharedChecklist(userId: number, checklistId: number) {
-    const checklist = await checklistRepository.getSharedChecklistByChecklistId(
+    const checklist = await this.checklistRepo.getSharedChecklistByChecklistId(
       userId,
       checklistId
     );

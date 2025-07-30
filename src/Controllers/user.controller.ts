@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import userService from "../Services/user.service.js";
 import { Checklist } from "../types/checklist.js";
-import checklistRepository from "../Repositories/checklist.repository.js";
 
 class UserController {
   async getChecklistsByUserId(req: Request, res: Response) {
@@ -50,6 +49,12 @@ class UserController {
     return res.status(201).send({
       message: "체크리스트 생성 완료",
     });
+  }
+
+  async updateChecklist(req: Request, res: Response) {
+    const userId = 1; // 추후 수정
+    const checklistId: number = Number(req.params.checklistId);
+    const incoming = req.body.items;
   }
 
   async deleteChecklist(req: Request, res: Response) {

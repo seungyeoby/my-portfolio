@@ -69,4 +69,4 @@ class ReviewsRepository {
   }
 }
 
-export default new ReviewsRepository();
+export default ReviewsRepository;
