@@ -1,5 +1,6 @@
 import checklistRepository from "../Repositories/checklist.repository.js";
 import reviewsRepository from "../Repositories/reviews.repository.js";
+import checklistItemsRepository from "../Repositories/checklistItems.repository.js";
 import { Checklist } from "../types/checklist.js";
 
 class userService {
@@ -31,6 +32,32 @@ class userService {
   async getChecklistsByUserId(userId: number) {
     const checklists = await checklistRepository.getChecklistsByUserId(userId);
     return checklists;
+  }
+
+  async getChecklistByReviewId(userId: number, checklistId: number) {
+    const checklist = await checklistRepository.getChecklistByChecklistId(
+      userId,
+      checklistId
+    );
+
+    if (!checklist) {
+      throw new Error("Not Found");
+    }
+
+    const { cities, ...flatChecklist } = checklist;
+    const flatChecklistWithCity = {
+      ...flatChecklist,
+      city: cities.cityName,
+    };
+
+    const items = await checklistItemsRepository.getChecklistItems(checklistId);
+    const itemRes = items.map((item) => ({
+      itemLabel: item.item.itemLabel,
+      packingBag: item.packingBag,
+    }));
+
+    const res = { ...flatChecklistWithCity, items: itemRes };
+    return res;
   }
 }
 

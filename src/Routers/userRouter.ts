@@ -20,6 +20,10 @@ router.get("/items-reviews/:reviewId", userController.getReviewByReviewId);
 router.get("/checklists", userController.getChecklistsByUserId);
 
 // 개별 체크리스트 조회
+router.get(
+  "/checklists/:checklistId",
+  userController.getChecklistByChecklistId
+);
 
 // 체크리스트 생성
 router.post("/checklists", userController.createChecklist);

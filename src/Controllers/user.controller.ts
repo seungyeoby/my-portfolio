@@ -11,6 +11,18 @@ class UserController {
     });
   }
 
+  async getChecklistByChecklistId(req: Request, res: Response) {
+    const userId: number = 1; // 추후수정
+    const checklistId: number = Number(req.params.checklistId);
+    const checklist = await userService.getChecklistByReviewId(
+      userId,
+      checklistId
+    );
+    return res.status(200).send({
+      checklist,
+    });
+  }
+
   async createChecklist(req: Request, res: Response) {
     const checklist: Checklist = req.body;
     await userService.createChecklist(checklist);

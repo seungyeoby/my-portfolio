@@ -71,6 +71,29 @@ class ChecklistRepository {
       throw new Error("DatabaseError");
     }
   }
+
+  async getChecklistByChecklistId(userId: number, checklistId: number) {
+    try {
+      return await prisma.checklist.findFirst({
+        where: { checklistId, userId, deletedAt: null },
+        select: {
+          checklistId: true,
+          title: true,
+          travelType: true,
+          cities: {
+            select: {
+              cityName: true,
+            },
+          },
+          travelStart: true,
+          travelEnd: true,
+          createdAt: true,
+        },
+      });
+    } catch (e) {
+      throw new Error("DatabaseError");
+    }
+  }
 }
 
 export default new ChecklistRepository();
