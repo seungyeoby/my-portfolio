@@ -27,4 +27,4 @@ class RecommendationRepository {
   }
 }
 
-export default new RecommendationRepository();
+export default RecommendationRepository;
