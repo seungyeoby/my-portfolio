@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../Services/user.service.js";
 import { Checklist } from "../types/checklist.js";
+import checklistRepository from "../Repositories/checklist.repository.js";
 
 class UserController {
   async getChecklistsByUserId(req: Request, res: Response) {
@@ -20,6 +21,26 @@ class UserController {
     );
     return res.status(200).send({
       checklist,
+    });
+  }
+
+  async getSharedChecklists(req: Request, res: Response) {
+    const userId: number = 1; // 추후수정
+    const sharedChecklists = await userService.getSharedChecklists(userId);
+    return res.status(200).send({
+      sharedChecklists,
+    });
+  }
+
+  async getSharedChecklist(req: Request, res: Response) {
+    const userId: number = 1; // 추후수정
+    const checklistId: number = Number(req.params.checklistId);
+    const sharedChecklist = await userService.getSharedChecklist(
+      userId,
+      checklistId
+    );
+    return res.status(200).send({
+      sharedChecklist,
     });
   }
 

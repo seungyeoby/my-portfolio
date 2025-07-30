@@ -94,6 +94,57 @@ class ChecklistRepository {
       throw new Error("DatabaseError");
     }
   }
+
+  async getSharedChecklistsByUserId(userId: number) {
+    try {
+      return await prisma.checklist.findMany({
+        select: {
+          checklistId: true,
+          title: true,
+          cityId: true,
+          travelType: true,
+          travelStart: true,
+          travelEnd: true,
+          createdAt: true,
+          //content: true,
+          likes: true,
+        },
+        where: {
+          userId,
+          isShared: true,
+          deletedAt: null,
+        },
+      });
+    } catch (e) {
+      throw new Error("DatabaseError");
+    }
+  }
+
+  async getSharedChecklistByChecklistId(userId: number, checklistId: number) {
+    try {
+      return await prisma.checklist.findFirst({
+        select: {
+          checklistId: true,
+          title: true,
+          cityId: true,
+          travelType: true,
+          travelStart: true,
+          travelEnd: true,
+          createdAt: true,
+          content: true,
+          likes: true,
+        },
+        where: {
+          userId,
+          isShared: true,
+          checklistId,
+          deletedAt: null,
+        },
+      });
+    } catch (e) {
+      throw new Error("DatabaseError");
+    }
+  }
 }
 
 export default new ChecklistRepository();

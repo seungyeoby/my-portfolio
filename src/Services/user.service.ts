@@ -59,6 +59,21 @@ class userService {
     const res = { ...flatChecklistWithCity, items: itemRes };
     return res;
   }
+
+  async getSharedChecklists(userId: number) {
+    const checklists = await checklistRepository.getSharedChecklistsByUserId(
+      userId
+    );
+    return checklists;
+  }
+
+  async getSharedChecklist(userId: number, checklistId: number) {
+    const checklist = await checklistRepository.getSharedChecklistByChecklistId(
+      userId,
+      checklistId
+    );
+    return checklist;
+  }
 }
 
 export default new userService();
