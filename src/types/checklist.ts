@@ -1,0 +1,18 @@
+import { TravelType, PackingBag } from "@prisma/client";
+
+export type Checklist = {
+  userId: number;
+  title: string;
+  cityId: number;
+  travelType: TravelType;
+  travelStart: string;
+  travelEnd: string;
+  isShared?: boolean;
+  content?: string;
+  items: Item[];
+};
+
+export type Item = {
+  itemId: number;
+  packingBag: PackingBag;
+};
