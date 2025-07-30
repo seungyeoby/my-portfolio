@@ -62,11 +62,13 @@ class userService {
 
     const items = await this.checklistItemsRepo.getChecklistItems(checklistId);
     const itemRes = items.map((item) => ({
+      checklistItemId: item.checklistItemId,
+      itemId: item.item.itemId,
       itemLabel: item.item.itemLabel,
       packingBag: item.packingBag,
     }));
 
-    const res = { ...flatChecklistWithCity, items: itemRes };
+    const res = { ...flatChecklistWithCity, itemRes };
     return res;
   }
 

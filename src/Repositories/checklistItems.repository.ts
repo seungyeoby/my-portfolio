@@ -11,6 +11,7 @@ class ChecklistItemsRepository {
           item: {
             select: {
               itemLabel: true,
+              itemId: true,
             },
           },
         },
