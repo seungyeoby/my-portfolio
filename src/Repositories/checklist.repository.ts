@@ -62,9 +62,11 @@ class ChecklistRepository {
           deletedAt: null,
         },
         omit: {
+          content: true,
           isShared: true,
           likes: true,
           updatedAt: true,
+          deletedAt: true,
         },
       });
     } catch (e) {
@@ -106,7 +108,7 @@ class ChecklistRepository {
           travelStart: true,
           travelEnd: true,
           createdAt: true,
-          //content: true,
+          content: true,
           likes: true,
         },
         where: {
@@ -133,6 +135,16 @@ class ChecklistRepository {
           createdAt: true,
           content: true,
           likes: true,
+          checklistItems: {
+            select: {
+              item: {
+                select: {
+                  itemLabel: true,
+                },
+              },
+              packingBag: true,
+            },
+          },
         },
         where: {
           userId,

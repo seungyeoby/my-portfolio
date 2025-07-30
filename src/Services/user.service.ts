@@ -1,7 +1,6 @@
 import ChecklistRepository from "../Repositories/checklist.repository.js";
 import ReviewsRepository from "../Repositories/reviews.repository.js";
 import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
-import prisma from "../lib/prisma.js";
 import { Checklist } from "../types/checklist.js";
 
 class userService {
@@ -15,6 +14,7 @@ class userService {
     this.checklistItemsRepo = new ChecklistItemsRepository();
   }
 
+  // 체크리스트 생성
   async createChecklist(checklist: Checklist) {
     const { items, ...checklistInfo } = checklist;
     await this.checklistRepo.saveChecklist(items, checklistInfo);
@@ -24,7 +24,7 @@ class userService {
     await this.checklistRepo.deleteChecklist(checklistId);
   }
 
-  async getAllReviewsByUserId(userId: number) {
+  async getAllReviews(userId: number) {
     const reviews = await this.reviewRepo.getAllReviewsByUserId(userId);
     return reviews;
   }
@@ -37,11 +37,13 @@ class userService {
     return review;
   }
 
+  // 전체 체크리스트 조회
   async getChecklistsByUserId(userId: number) {
     const checklists = await this.checklistRepo.getChecklistsByUserId(userId);
     return checklists;
   }
 
+  // 개별 체크리스트 조회
   async getChecklistByReviewId(userId: number, checklistId: number) {
     const checklist = await this.checklistRepo.getChecklistByChecklistId(
       userId,
@@ -49,7 +51,7 @@ class userService {
     );
 
     if (!checklist) {
-      throw new Error("Not Found");
+      throw new Error("NotFound");
     }
 
     const { cities, ...flatChecklist } = checklist;
@@ -80,6 +82,11 @@ class userService {
       userId,
       checklistId
     );
+
+    if (!checklist) {
+      throw new Error("NotFound");
+    }
+
     return checklist;
   }
 }
