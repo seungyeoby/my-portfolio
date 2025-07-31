@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-class ItemsRepository {
+export default class ItemsRepository {
   async getItemsByClickCountDesc() {
     try {
       return await prisma.item.findMany({
@@ -20,5 +20,3 @@ class ItemsRepository {
     }
   }
 }
-
-export default ItemsRepository;

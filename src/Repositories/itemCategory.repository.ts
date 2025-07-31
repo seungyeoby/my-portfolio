@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-class ItemCategoryRepository {
+export default class ItemCategoryRepository {
   async getItems() {
     try {
       return await prisma.itemCategory.findMany({
@@ -18,5 +18,3 @@ class ItemCategoryRepository {
     }
   }
 }
-
-export default ItemCategoryRepository;

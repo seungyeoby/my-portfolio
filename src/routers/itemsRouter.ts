@@ -1,11 +1,14 @@
 import Router from "express";
-import ItemController from "../Controllers/items.controller.js";
-const router = Router();
+import type ItemController from "../Controllers/items.controller.js";
 
-// 전체 아이템 조회
-router.get("/", ItemController.getWholeItems);
+export default function itemRouter(itemController: ItemController) {
+  const router = Router();
 
-// 많이 클릭된 아이템 순으로 조회
-router.get("/most-clicked", ItemController.getItemsByClickCountDesc);
+  // 전체 아이템 조회
+  router.get("/", itemController.getWholeItems);
 
-export default router;
+  // 많이 클릭된 아이템 순으로 조회
+  router.get("/most-clicked", itemController.getItemsByClickCountDesc);
+
+  return router;
+}
