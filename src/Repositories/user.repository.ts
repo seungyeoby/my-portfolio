@@ -1,0 +1,17 @@
+import prisma from "../lib/prisma.js";
+
+class UserRepository {
+  async getPublicPersonalInfo(userId: number) {
+    try {
+      return await prisma.user.findFirst({
+        where: {
+          userId,
+        },
+      });
+    } catch (e) {
+      throw new Error("DataBaseError");
+    }
+  }
+}
+
+export default UserRepository;

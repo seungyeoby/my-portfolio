@@ -6,7 +6,13 @@ import { PackingBag } from "@prisma/client";
 
 class UserController {
   // 개인정보 조회
-  async getPersonalInfo() {}
+  async getPersonalInfo(req: Request, res: Response) {
+    const userId: number = 1; //추후 수정
+    const publicPersonalInfo = await userService.getPublicPersonalInfo(userId);
+    return res.status(200).send({
+      publicPersonalInfo,
+    });
+  }
 
   // 개인정보 수정
   async updatePersonalInfo() {}

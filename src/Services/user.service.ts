@@ -1,6 +1,7 @@
 import ChecklistRepository from "../Repositories/checklist.repository.js";
 import ReviewsRepository from "../Repositories/reviews.repository.js";
 import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import UserRepository from "../Repositories/user.repository.js";
 import { Checklist } from "../types/checklist.js";
 import { Change } from "../types/change.js";
 import { PackingBag } from "@prisma/client";
@@ -9,11 +10,23 @@ class userService {
   private checklistRepo: ChecklistRepository;
   private reviewRepo: ReviewsRepository;
   private checklistItemsRepo: ChecklistItemsRepository;
+  private userRepo: UserRepository;
 
   constructor() {
     this.checklistRepo = new ChecklistRepository();
     this.reviewRepo = new ReviewsRepository();
     this.checklistItemsRepo = new ChecklistItemsRepository();
+    this.userRepo = new UserRepository();
+  }
+
+  // 개인정보 조회
+  async getPublicPersonalInfo(userId: number) {
+    const userInfo = await this.userRepo.getPublicPersonalInfo(userId);
+    if (!userInfo) {
+      throw new Error("UserNotFound");
+    }
+    const { password, userId: _, ...publicUserInfo } = userInfo;
+    return publicUserInfo;
   }
 
   // 체크리스트 생성
