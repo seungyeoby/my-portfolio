@@ -1,44 +1,47 @@
 import { Router } from "express";
-import userController from "../Controllers/user.controller.js";
-const router: Router = Router();
+import type UserController from "../Controllers/user.controller.js";
 
-// 개인정보 조회
-router.get("/", userController.getPersonalInfo);
+export default function userRouter(userController: UserController) {
+  const router: Router = Router();
 
-// 개인정보 수정
-router.patch("/", userController.updatePersonalInfo);
+  // 개인정보 조회
+  router.get("/", userController.getPersonalInfo);
 
-// 전체 준비물 리뷰 조회 ✅
-router.get("/items-reviews", userController.getAllReviews);
+  // 개인정보 수정
+  router.patch("/", userController.updatePersonalInfo);
 
-// 개별 준비물 리뷰 조회 ✅
-router.get("/items-reviews/:reviewId", userController.getReviewByReviewId);
+  // 전체 준비물 리뷰 조회
+  router.get("/items-reviews", userController.getAllReviews);
 
-// 내가 공유한 체크리스트 전체 조회 ✅
-router.get("/shared-checklists", userController.getSharedChecklists);
+  // 개별 준비물 리뷰 조회
+  router.get("/items-reviews/:reviewId", userController.getReviewByReviewId);
 
-// 내가 공유한 개별 체크리스트 조회 ✅
-router.get(
-  "/shared-checklists/:checklistId",
-  userController.getSharedChecklist
-);
+  // 내가 공유한 체크리스트 전체 조회
+  router.get("/shared-checklists", userController.getSharedChecklists);
 
-// 전체 체크리스트 조회 ✅
-router.get("/checklists", userController.getChecklistsByUserId);
+  // 내가 공유한 개별 체크리스트 조회
+  router.get(
+    "/shared-checklists/:checklistId",
+    userController.getSharedChecklist
+  );
 
-// 개별 체크리스트 조회 ✅
-router.get(
-  "/checklists/:checklistId",
-  userController.getChecklistByChecklistId
-);
+  // 전체 체크리스트 조회
+  router.get("/checklists", userController.getChecklistsByUserId);
 
-// 체크리스트 생성 ✅
-router.post("/checklists", userController.createChecklist);
+  // 개별 체크리스트 조회
+  router.get(
+    "/checklists/:checklistId",
+    userController.getChecklistByChecklistId
+  );
 
-// 체크리스트 수정
-router.patch("/checklists/:checklistId", userController.updateChecklist);
+  // 체크리스트 생성
+  router.post("/checklists", userController.createChecklist);
 
-// 체크리스트 삭제 ✅
-router.delete("/checklists/:checklistId", userController.deleteChecklist);
+  // 체크리스트 수정
+  router.patch("/checklists/:checklistId", userController.updateChecklist);
 
-export default router;
+  // 체크리스트 삭제
+  router.delete("/checklists/:checklistId", userController.deleteChecklist);
+
+  return router;
+}

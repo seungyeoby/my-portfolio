@@ -1,105 +1,108 @@
 import { Request, Response } from "express";
-import userService from "../Services/user.service.js";
+import type UserService from "../Services/user.service.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { PackingBag } from "@prisma/client";
 
-class UserController {
+export default class UserController {
+  constructor(private userService: UserService) {}
   // 개인정보 조회
-  async getPersonalInfo(req: Request, res: Response) {
+  getPersonalInfo = async (req: Request, res: Response) => {
     const userId: number = 1; //추후 수정
-    const publicPersonalInfo = await userService.getPublicPersonalInfo(userId);
+    const publicPersonalInfo = await this.userService.getPublicPersonalInfo(
+      userId
+    );
     return res.status(200).send({
       publicPersonalInfo,
     });
-  }
+  };
 
   // 개인정보 수정
-  async updatePersonalInfo(req: Request, res: Response) {
+  updatePersonalInfo = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후 수정
     const updatedInfo = req.body;
-    const updatedUser = await userService.updatePersonalInfo(
+    const updatedUser = await this.userService.updatePersonalInfo(
       userId,
       updatedInfo
     );
     return res.status(200).send({
       updatedUser,
     });
-  }
+  };
 
   // 전체 준비물 리뷰 조회
-  async getAllReviews(req: Request, res: Response) {
+  getAllReviews = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후 수정
-    const reviews = await userService.getAllReviews(userId);
+    const reviews = await this.userService.getAllReviews(userId);
     return res.status(200).send({
       reviews,
     });
-  }
+  };
 
   // 개별 준비물 리뷰 조회
-  async getReviewByReviewId(req: Request, res: Response) {
+  getReviewByReviewId = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후 수정
     const reviewId: number = Number(req.params.reviewId);
-    const review = await userService.getReviewByReviewId(userId, reviewId);
+    const review = await this.userService.getReviewByReviewId(userId, reviewId);
     return res.status(200).send({
       review,
     });
-  }
+  };
 
   // 내가 공유한 체크리스트 전체 조회
-  async getSharedChecklists(req: Request, res: Response) {
+  getSharedChecklists = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후수정
-    const sharedChecklists = await userService.getSharedChecklists(userId);
+    const sharedChecklists = await this.userService.getSharedChecklists(userId);
     return res.status(200).send({
       sharedChecklists,
     });
-  }
+  };
 
   // 내가 공유한 개별 체크리스트 조회
-  async getSharedChecklist(req: Request, res: Response) {
+  getSharedChecklist = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후수정
     const checklistId: number = Number(req.params.checklistId);
-    const sharedChecklist = await userService.getSharedChecklist(
+    const sharedChecklist = await this.userService.getSharedChecklist(
       userId,
       checklistId
     );
     return res.status(200).send({
       sharedChecklist,
     });
-  }
+  };
 
   // 전체 체크리스트 조회
-  async getChecklistsByUserId(req: Request, res: Response) {
+  getChecklistsByUserId = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후 수정
-    const checklists = await userService.getChecklistsByUserId(userId);
+    const checklists = await this.userService.getChecklistsByUserId(userId);
     return res.status(200).send({
       checklists,
     });
-  }
+  };
 
   // 개별 체크리스트 조회
-  async getChecklistByChecklistId(req: Request, res: Response) {
+  getChecklistByChecklistId = async (req: Request, res: Response) => {
     const userId: number = 1; // 추후수정
     const checklistId: number = Number(req.params.checklistId);
-    const checklist = await userService.getChecklistByReviewId(
+    const checklist = await this.userService.getChecklistByReviewId(
       userId,
       checklistId
     );
     return res.status(200).send({
       checklist,
     });
-  }
+  };
 
   // 체크리스트 생성
-  async createChecklist(req: Request, res: Response) {
+  createChecklist = async (req: Request, res: Response) => {
     const checklist: Checklist = req.body;
-    await userService.createChecklist(checklist);
+    await this.userService.createChecklist(checklist);
     return res.status(201).send({
       message: "체크리스트 생성 완료",
     });
-  }
+  };
 
   // 체크리스트 수정
-  async updateChecklist(req: Request, res: Response) {
+  updateChecklist = async (req: Request, res: Response) => {
     const checklistId: number = Number(req.params.checklistId);
     const change: ChangedChecklistItems = {
       addedItems: (req.body.addedItems ?? []).map((it: any) => ({
@@ -109,19 +112,17 @@ class UserController {
       removedItems: req.body.removedItems ?? [],
       packingBagChangedItems: req.body.packingBagChangedItems ?? [],
     };
-    await userService.updateChecklist(checklistId, change);
-    return res.status(204);
-  }
+    await this.userService.updateChecklist(checklistId, change);
+    return res.sendStatus(204);
+  };
 
   // 체크리스트 삭제
-  async deleteChecklist(req: Request, res: Response) {
+  deleteChecklist = async (req: Request, res: Response) => {
     const checklistId: number = Number(req.params.checklistId);
-    await userService.deleteChecklist(checklistId);
+    await this.userService.deleteChecklist(checklistId);
     return res.status(200).send({
       message: "체크리스트 soft-delete 완료",
       deletedId: checklistId,
     });
-  }
+  };
 }
-
-export default new UserController();

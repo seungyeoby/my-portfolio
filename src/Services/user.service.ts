@@ -1,15 +1,21 @@
-import checklistRepository from "../Repositories/checklist.repository.js";
-import reviewsRepository from "../Repositories/reviews.repository.js";
-import checklistItemsRepository from "../Repositories/checklistItems.repository.js";
-import userRepository from "../Repositories/user.repository.js";
+import type UserRepository from "../Repositories/user.repository.js";
+import type ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import type ReviewsRepository from "../Repositories/reviews.repository.js";
+import type ChecklistsRepository from "../Repositories/checklist.repository.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
 
-class userService {
+export default class UserService {
+  constructor(
+    private userRepo: UserRepository,
+    private checklistItemsRepo: ChecklistItemsRepository,
+    private checklistsRepo: ChecklistsRepository,
+    private reviewsRepo: ReviewsRepository
+  ) {}
   // 개인정보 조회
   async getPublicPersonalInfo(userId: number) {
-    const userInfo = await userRepository.getPublicPersonalInfo(userId);
+    const userInfo = await this.userRepo.getPublicPersonalInfo(userId);
     if (!userInfo) {
       throw new Error("UserNotFound");
     }
@@ -23,7 +29,7 @@ class userService {
       updatedInfo.birthDate = new Date(updatedInfo.birthDate);
     }
 
-    const updatedUser = await userRepository.updatePersonalInfo(
+    const updatedUser = await this.userRepo.updatePersonalInfo(
       userId,
       updatedInfo
     );
@@ -34,23 +40,20 @@ class userService {
   // 체크리스트 생성
   async createChecklist(checklist: Checklist) {
     const { items, ...checklistInfo } = checklist;
-    await checklistRepository.saveChecklist(items, checklistInfo);
+    await this.checklistsRepo.saveChecklist(items, checklistInfo);
   }
 
   async deleteChecklist(checklistId: number) {
-    await checklistRepository.deleteChecklist(checklistId);
+    await this.checklistsRepo.deleteChecklist(checklistId);
   }
 
   async getAllReviews(userId: number) {
-    const reviews = await reviewsRepository.getAllReviewsByUserId(userId);
+    const reviews = await this.reviewsRepo.getAllReviewsByUserId(userId);
     return reviews;
   }
 
   async getReviewByReviewId(userId: number, reviewId: number) {
-    const review = await reviewsRepository.getReviewByReviewId(
-      userId,
-      reviewId
-    );
+    const review = await this.reviewsRepo.getReviewByReviewId(userId, reviewId);
     if (!review) {
       throw new Error("NotFound");
     }
@@ -59,13 +62,13 @@ class userService {
 
   // 전체 체크리스트 조회
   async getChecklistsByUserId(userId: number) {
-    const checklists = await checklistRepository.getChecklistsByUserId(userId);
+    const checklists = await this.checklistsRepo.getChecklistsByUserId(userId);
     return checklists;
   }
 
   // 개별 체크리스트 조회
   async getChecklistByReviewId(userId: number, checklistId: number) {
-    const checklist = await checklistRepository.getChecklistByChecklistId(
+    const checklist = await this.checklistsRepo.getChecklistByChecklistId(
       userId,
       checklistId
     );
@@ -80,7 +83,7 @@ class userService {
       city: cities.cityName,
     };
 
-    const items = await checklistItemsRepository.getChecklistItems(checklistId);
+    const items = await this.checklistItemsRepo.getChecklistItems(checklistId);
     const itemRes = items.map((item) => ({
       checklistItemId: item.checklistItemId,
       itemId: item.item.itemId,
@@ -93,14 +96,14 @@ class userService {
   }
 
   async getSharedChecklists(userId: number) {
-    const checklists = await checklistRepository.getSharedChecklistsByUserId(
+    const checklists = await this.checklistsRepo.getSharedChecklistsByUserId(
       userId
     );
     return checklists;
   }
 
   async getSharedChecklist(userId: number, checklistId: number) {
-    const checklist = await checklistRepository.getSharedChecklistByChecklistId(
+    const checklist = await this.checklistsRepo.getSharedChecklistByChecklistId(
       userId,
       checklistId
     );
@@ -115,19 +118,19 @@ class userService {
   // 체크리스트 수정
   async updateChecklist(checklistId: number, change: ChangedChecklistItems) {
     if (change.addedItems.length) {
-      await checklistItemsRepository.addNewChecklistItems(
+      await this.checklistItemsRepo.addNewChecklistItems(
         change.addedItems,
         checklistId
       );
     }
 
     if (change.removedItems.length) {
-      await checklistItemsRepository.removeChecklistItems(change.removedItems);
+      await this.checklistItemsRepo.removeChecklistItems(change.removedItems);
     }
 
     if (change.packingBagChangedItems.length) {
       const beforeStatus =
-        await checklistItemsRepository.getChecklistItemsByChecklistItemId(
+        await this.checklistItemsRepo.getChecklistItemsByChecklistItemId(
           change.packingBagChangedItems
         );
       const updates = beforeStatus.map(({ checklistItemId, packingBag }) => ({
@@ -135,9 +138,7 @@ class userService {
         newValue:
           packingBag === PackingBag.HAND ? PackingBag.HOLD : PackingBag.HAND,
       }));
-      await checklistItemsRepository.updatePackingBag(updates);
+      await this.checklistItemsRepo.updatePackingBag(updates);
     }
   }
 }
-
-export default new userService();

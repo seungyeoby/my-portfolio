@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 
-class UserRepository {
+export default class UserRepository {
   async getPublicPersonalInfo(userId: number) {
     try {
       return await prisma.user.findFirst({
@@ -25,5 +25,3 @@ class UserRepository {
     }
   }
 }
-
-export default new UserRepository();

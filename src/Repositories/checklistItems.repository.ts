@@ -2,7 +2,7 @@ import { PackingBag } from "@prisma/client";
 import prisma from "../lib/prisma.js";
 import { ChangedChecklistItems } from "../types/checklist.js";
 
-class ChecklistItemsRepository {
+export default class ChecklistItemsRepository {
   async getChecklistItems(checklistId: number) {
     try {
       return await prisma.checklistItem.findMany({
@@ -87,5 +87,3 @@ class ChecklistItemsRepository {
     }
   }
 }
-
-export default new ChecklistItemsRepository();

@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-class ReviewsRepository {
+export default class ReviewsRepository {
   async getAllReviewsByUserId(userId: number) {
     try {
       return await prisma.itemReview.findMany({
@@ -68,5 +68,3 @@ class ReviewsRepository {
     }
   }
 }
-
-export default new ReviewsRepository();

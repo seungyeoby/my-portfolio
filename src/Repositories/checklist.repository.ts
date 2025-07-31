@@ -2,7 +2,7 @@ import prisma from "../lib/prisma.js";
 import { Prisma } from "@prisma/client";
 import { Checklist, Item } from "../types/checklist.js";
 
-class ChecklistRepository {
+export default class ChecklistsRepository {
   async saveChecklist(items: Item[], checklistInfo: Omit<Checklist, "items">) {
     try {
       const parsedChecklistInfo = {
@@ -159,5 +159,3 @@ class ChecklistRepository {
     }
   }
 }
-
-export default new ChecklistRepository();
