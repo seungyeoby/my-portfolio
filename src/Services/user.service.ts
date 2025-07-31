@@ -2,6 +2,8 @@ import ChecklistRepository from "../Repositories/checklist.repository.js";
 import ReviewsRepository from "../Repositories/reviews.repository.js";
 import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
 import { Checklist } from "../types/checklist.js";
+import { Change } from "../types/change.js";
+import { PackingBag } from "@prisma/client";
 
 class userService {
   private checklistRepo: ChecklistRepository;
@@ -90,6 +92,33 @@ class userService {
     }
 
     return checklist;
+  }
+
+  // 체크리스트 수정
+  async updateChecklist(checklistId: number, change: Change) {
+    if (change.addedItems.length) {
+      await this.checklistItemsRepo.addNewChecklistItems(
+        change.addedItems,
+        checklistId
+      );
+    }
+
+    if (change.removedItems.length) {
+      await this.checklistItemsRepo.removeChecklistItems(change.removedItems);
+    }
+
+    if (change.packingBagChangedItems.length) {
+      const beforeStatus =
+        await this.checklistItemsRepo.getChecklistItemsByChecklistItemId(
+          change.packingBagChangedItems
+        );
+      const updates = beforeStatus.map(({ checklistItemId, packingBag }) => ({
+        id: checklistItemId,
+        newValue:
+          packingBag === PackingBag.HAND ? PackingBag.HOLD : PackingBag.HAND,
+      }));
+      await this.checklistItemsRepo.updatePackingBag(updates);
+    }
   }
 }
 

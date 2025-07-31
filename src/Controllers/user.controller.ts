@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import userService from "../Services/user.service.js";
 import { Checklist } from "../types/checklist.js";
+import { Change } from "../types/change.js";
+import { PackingBag } from "@prisma/client";
 
 class UserController {
   // 개인정보 조회
@@ -83,9 +85,17 @@ class UserController {
 
   // 체크리스트 수정
   async updateChecklist(req: Request, res: Response) {
-    const userId = 1; // 추후 수정
     const checklistId: number = Number(req.params.checklistId);
-    const incoming = req.body.items;
+    const change: Change = {
+      addedItems: (req.body.added_items ?? []).map((it: any) => ({
+        itemId: it.item_id,
+        packingBag: it.packing_bag as PackingBag,
+      })),
+      removedItems: req.body.removed_items ?? [],
+      packingBagChangedItems: req.body.packing_bag_changed_items ?? [],
+    };
+    await userService.updateChecklist(checklistId, change);
+    return res.status(204);
   }
 
   // 체크리스트 삭제
