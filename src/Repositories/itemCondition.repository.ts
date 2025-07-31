@@ -1,12 +1,10 @@
 import prisma from "../lib/prisma.js";
 
-class RecommendationRepository {
+export default class ItemConditionRepository {
   async getRecommendedItemIds(options: string[]) {
     try {
       return await prisma.itemCondition.findMany({
         select: {
-          itemConditionId: false,
-          conditionValue: false,
           item: {
             select: {
               categoryId: true,
@@ -26,5 +24,3 @@ class RecommendationRepository {
     }
   }
 }
-
-export default RecommendationRepository;

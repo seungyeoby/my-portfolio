@@ -1,8 +1,8 @@
-import RecommendationRepository from "../Repositories/recommendation.repository.js";
+import type ItemConditionRepository from "../Repositories/itemCondition.repository.js";
 import { Answer } from "../types/answer.js";
 
-class RecommendationService {
-  constructor(private repo: RecommendationRepository) {}
+export default class RecommendationService {
+  constructor(private itemConditionRepo: ItemConditionRepository) {}
 
   async getRecommendedItemIds(answer: Answer) {
     // 계절 계산
@@ -47,7 +47,8 @@ class RecommendationService {
       }
     }
 
-    const recommendedItemIds = await this.repo.getRecommendedItemIds(options);
+    const recommendedItemIds =
+      await this.itemConditionRepo.getRecommendedItemIds(options);
 
     const uniqueItemMap = new Map();
     for (const { item } of recommendedItemIds) {
@@ -57,12 +58,8 @@ class RecommendationService {
       }
     }
 
-    const recommendedItems = Array.from(uniqueItemMap.values());
+    const recommendedItems = [...uniqueItemMap.values()];
 
     return recommendedItems;
   }
 }
-
-const recommendationRepository = new RecommendationRepository();
-
-export default new RecommendationService(recommendationRepository);

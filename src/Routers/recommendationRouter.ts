@@ -1,7 +1,12 @@
 import { Router } from "express";
-import recommendationController from "../Controllers/recommendation.controller.js";
-const router: Router = Router();
+import type RecommendationController from "../Controllers/recommendation.controller.js";
 
-router.post("/", recommendationController.getRecommendedItems);
+export default function recommendationRouter(
+  recommendationController: RecommendationController
+) {
+  const router: Router = Router();
 
-export default router;
+  router.post("/", recommendationController.getRecommendedItems);
+
+  return router;
+}
