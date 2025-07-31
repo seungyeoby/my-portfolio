@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 
 class UserRepository {
   async getPublicPersonalInfo(userId: number) {
@@ -7,6 +8,17 @@ class UserRepository {
         where: {
           userId,
         },
+      });
+    } catch (e) {
+      throw new Error("DataBaseError");
+    }
+  }
+
+  async updatePersonalInfo(userId: number, updatedInfo: UpdatedUserInfo) {
+    try {
+      return await prisma.user.update({
+        where: { userId },
+        data: { ...updatedInfo },
       });
     } catch (e) {
       throw new Error("DataBaseError");

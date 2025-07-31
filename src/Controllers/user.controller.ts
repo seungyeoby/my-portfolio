@@ -3,6 +3,7 @@ import userService from "../Services/user.service.js";
 import { Checklist } from "../types/checklist.js";
 import { Change } from "../types/change.js";
 import { PackingBag } from "@prisma/client";
+import userRepository from "../Repositories/user.repository.js";
 
 class UserController {
   // 개인정보 조회
@@ -15,7 +16,17 @@ class UserController {
   }
 
   // 개인정보 수정
-  async updatePersonalInfo() {}
+  async updatePersonalInfo(req: Request, res: Response) {
+    const userId: number = 1; // 추후 수정
+    const updatedInfo = req.body;
+    const updatedUser = await userService.updatePersonalInfo(
+      userId,
+      updatedInfo
+    );
+    return res.status(200).send({
+      updatedUser,
+    });
+  }
 
   // 전체 준비물 리뷰 조회
   async getAllReviews(req: Request, res: Response) {
@@ -93,12 +104,12 @@ class UserController {
   async updateChecklist(req: Request, res: Response) {
     const checklistId: number = Number(req.params.checklistId);
     const change: Change = {
-      addedItems: (req.body.added_items ?? []).map((it: any) => ({
-        itemId: it.item_id,
-        packingBag: it.packing_bag as PackingBag,
+      addedItems: (req.body.addedItems ?? []).map((it: any) => ({
+        itemId: it.itemId,
+        packingBag: it.packingBag as PackingBag,
       })),
-      removedItems: req.body.removed_items ?? [],
-      packingBagChangedItems: req.body.packing_bag_changed_items ?? [],
+      removedItems: req.body.removedItems ?? [],
+      packingBagChangedItems: req.body.packingBagChangedItems ?? [],
     };
     await userService.updateChecklist(checklistId, change);
     return res.status(204);

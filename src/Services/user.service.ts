@@ -4,6 +4,7 @@ import checklistItemsRepository from "../Repositories/checklistItems.repository.
 import userRepository from "../Repositories/user.repository.js";
 import { Checklist } from "../types/checklist.js";
 import { Change } from "../types/change.js";
+import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
 
 class userService {
@@ -14,6 +15,20 @@ class userService {
       throw new Error("UserNotFound");
     }
     const { password, userId: _, ...publicUserInfo } = userInfo;
+    return publicUserInfo;
+  }
+
+  // 개인정보 수정
+  async updatePersonalInfo(userId: number, updatedInfo: UpdatedUserInfo) {
+    if (updatedInfo.birthDate) {
+      updatedInfo.birthDate = new Date(updatedInfo.birthDate);
+    }
+
+    const updatedUser = await userRepository.updatePersonalInfo(
+      userId,
+      updatedInfo
+    );
+    const { password, userId: _, ...publicUserInfo } = updatedUser;
     return publicUserInfo;
   }
 
