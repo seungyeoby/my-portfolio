@@ -86,4 +86,4 @@ class ChecklistItemsRepository {
   }
 }
 
-export default ChecklistItemsRepository;
+export default new ChecklistItemsRepository();

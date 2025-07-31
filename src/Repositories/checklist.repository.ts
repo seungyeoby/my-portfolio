@@ -160,4 +160,4 @@ class ChecklistRepository {
   }
 }
 
-export default ChecklistRepository;
+export default new ChecklistRepository();
