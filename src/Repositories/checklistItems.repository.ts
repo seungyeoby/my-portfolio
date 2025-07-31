@@ -1,6 +1,6 @@
 import { PackingBag } from "@prisma/client";
 import prisma from "../lib/prisma.js";
-import { Change } from "../types/change.js";
+import { ChangedChecklistItems } from "../types/checklist.js";
 
 class ChecklistItemsRepository {
   async getChecklistItems(checklistId: number) {
@@ -35,7 +35,7 @@ class ChecklistItemsRepository {
   }
 
   async addNewChecklistItems(
-    newItems: Change["addedItems"],
+    newItems: ChangedChecklistItems["addedItems"],
     checklistId: number
   ) {
     try {
@@ -51,7 +51,9 @@ class ChecklistItemsRepository {
     }
   }
 
-  async removeChecklistItems(removedItems: Change["removedItems"]) {
+  async removeChecklistItems(
+    removedItems: ChangedChecklistItems["removedItems"]
+  ) {
     try {
       await prisma.checklistItem.updateMany({
         where: {

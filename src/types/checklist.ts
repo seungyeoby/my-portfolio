@@ -16,3 +16,12 @@ export type Item = {
   itemId: number;
   packingBag: PackingBag;
 };
+
+export type ChangedChecklistItems = {
+  addedItems: {
+    itemId: number;
+    packingBag: PackingBag;
+  }[];
+  removedItems: number[];
+  packingBagChangedItems: number[];
+};

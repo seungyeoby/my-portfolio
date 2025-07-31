@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../Services/user.service.js";
-import { Checklist } from "../types/checklist.js";
-import { Change } from "../types/change.js";
+import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { PackingBag } from "@prisma/client";
-import userRepository from "../Repositories/user.repository.js";
 
 class UserController {
   // 개인정보 조회
@@ -103,7 +101,7 @@ class UserController {
   // 체크리스트 수정
   async updateChecklist(req: Request, res: Response) {
     const checklistId: number = Number(req.params.checklistId);
-    const change: Change = {
+    const change: ChangedChecklistItems = {
       addedItems: (req.body.addedItems ?? []).map((it: any) => ({
         itemId: it.itemId,
         packingBag: it.packingBag as PackingBag,

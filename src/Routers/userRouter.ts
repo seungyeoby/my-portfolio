@@ -1,6 +1,6 @@
 import { Router } from "express";
 import userController from "../Controllers/user.controller.js";
-const router = Router();
+const router: Router = Router();
 
 // 개인정보 조회
 router.get("/", userController.getPersonalInfo);

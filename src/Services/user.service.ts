@@ -2,8 +2,7 @@ import checklistRepository from "../Repositories/checklist.repository.js";
 import reviewsRepository from "../Repositories/reviews.repository.js";
 import checklistItemsRepository from "../Repositories/checklistItems.repository.js";
 import userRepository from "../Repositories/user.repository.js";
-import { Checklist } from "../types/checklist.js";
-import { Change } from "../types/change.js";
+import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
 
@@ -114,7 +113,7 @@ class userService {
   }
 
   // 체크리스트 수정
-  async updateChecklist(checklistId: number, change: Change) {
+  async updateChecklist(checklistId: number, change: ChangedChecklistItems) {
     if (change.addedItems.length) {
       await checklistItemsRepository.addNewChecklistItems(
         change.addedItems,
