@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
-import type UserService from "../Services/user.service.js";
+import UserService from "../Services/user.service.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { PackingBag } from "@prisma/client";
 
-export default class UserController {
-  constructor(private userService: UserService) {}
+class UserController {
+  private userService: UserService;
+  constructor() {
+    this.userService = new UserService();
+  }
   // 개인정보 조회
   getPersonalInfo = async (req: Request, res: Response) => {
-    const userId: number = 1; //추후 수정
+    const userId: number = 2; //추후 수정
     const publicPersonalInfo = await this.userService.getPublicPersonalInfo(
       userId
     );
@@ -126,3 +129,5 @@ export default class UserController {
     });
   };
 }
+
+export default new UserController();

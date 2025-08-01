@@ -1,24 +1,36 @@
-import type UserRepository from "../Repositories/user.repository.js";
-import type ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
-import type ReviewsRepository from "../Repositories/reviews.repository.js";
-import type ChecklistsRepository from "../Repositories/checklist.repository.js";
+import UserRepository from "../Repositories/user.repository.js";
+import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import ReviewsRepository from "../Repositories/reviews.repository.js";
+import ChecklistsRepository from "../Repositories/checklist.repository.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
 
 export default class UserService {
-  constructor(
-    private userRepo: UserRepository,
-    private checklistItemsRepo: ChecklistItemsRepository,
-    private checklistsRepo: ChecklistsRepository,
-    private reviewsRepo: ReviewsRepository
-  ) {}
+  private userRepo: UserRepository;
+  private checklistItemsRepo: ChecklistItemsRepository;
+  private checklistsRepo: ChecklistsRepository;
+  private reviewsRepo: ReviewsRepository;
+
+  constructor() {
+    (this.userRepo = new UserRepository()),
+      (this.checklistItemsRepo = new ChecklistItemsRepository()),
+      (this.checklistsRepo = new ChecklistsRepository()),
+      (this.reviewsRepo = new ReviewsRepository());
+  }
   // 개인정보 조회
   async getPublicPersonalInfo(userId: number) {
-    const userInfo = await this.userRepo.getPublicPersonalInfo(userId);
+    let userInfo = await this.userRepo.getPublicPersonalInfo(userId);
     if (!userInfo) {
       throw new Error("UserNotFound");
     }
+    if (userInfo.profilePhoto) {
+      userInfo = {
+        ...userInfo,
+        profilePhoto: `http://localhost:4000${userInfo.profilePhoto}`,
+      };
+    }
+
     const { password, userId: _, ...publicUserInfo } = userInfo;
     return publicUserInfo;
   }
@@ -56,7 +68,7 @@ export default class UserService {
     let review = await this.reviewsRepo.getReviewByReviewId(userId, reviewId);
 
     if (!review) {
-      throw new Error("NotFound");
+      throw new Error("ReviewNotFound");
     }
 
     if (review.image) {
@@ -80,7 +92,7 @@ export default class UserService {
     );
 
     if (!checklist) {
-      throw new Error("NotFound");
+      throw new Error("ChecklistNotFound");
     }
 
     const { cities, ...flatChecklist } = checklist;
@@ -115,7 +127,7 @@ export default class UserService {
     );
 
     if (!checklist) {
-      throw new Error("NotFound");
+      throw new Error("ChecklistNotFound");
     }
 
     return checklist;
