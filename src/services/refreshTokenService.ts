@@ -21,8 +21,8 @@ export class RefreshTokenService {
     // 데이터베이스에 저장
     await this.refreshTokenRepository.create({
       userId,
-      token,
-      expiresAt,
+        token,
+        expiresAt,
     });
 
     return token;
