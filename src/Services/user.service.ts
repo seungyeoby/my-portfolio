@@ -53,10 +53,16 @@ export default class UserService {
   }
 
   async getReviewByReviewId(userId: number, reviewId: number) {
-    const review = await this.reviewsRepo.getReviewByReviewId(userId, reviewId);
+    let review = await this.reviewsRepo.getReviewByReviewId(userId, reviewId);
+
     if (!review) {
       throw new Error("NotFound");
     }
+
+    if (review.image) {
+      review = { ...review, image: `http://localhost:4000${review.image}` };
+    }
+
     return review;
   }
 
