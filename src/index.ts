@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import cors from "cors";
-import itemRouter from "./routers/itemsRouter.js";
+import itemRouter from "./items/items.router.js";
 import errorHandlingMiddleware from "./middlewares/error-handling.js";
 
 const app: Express = express();

@@ -1,4 +1,4 @@
-import ItemService from "../services/items.service.js";
+import ItemService from "./items.service.js";
 import { Request, Response } from "express";
 
 class ItemController {
