@@ -1,6 +1,6 @@
 import express from "express";
-import { uploadProfilePhoto } from "../middlewares/upload.js";
-import { AuthController } from "../controllers/authController.js";
+import { uploadProfilePhoto } from "../../middlewares/upload.js";
+import { AuthController } from "./auth.controller.js";
 import { 
   signupValidation, 
   signinValidation, 
@@ -8,7 +8,7 @@ import {
   resetPasswordValidation,
   validateEmailNotExists,
   validateNicknameNotExists
-} from "../middlewares/validation.js";
+} from "../../middlewares/validation.js";
 
 const router = express.Router();
 const authController = new AuthController();

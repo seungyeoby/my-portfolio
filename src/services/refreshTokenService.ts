@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { RefreshTokenRepository } from "../repositories/refreshToken.Repository.js";
+import { RefreshTokenRepository } from "../repositories/refreshToken.repository.js";
 
 export class RefreshTokenService {
   private refreshTokenRepository: RefreshTokenRepository;

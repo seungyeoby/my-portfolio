@@ -1,21 +1,17 @@
 import { Response } from "express";
-import bcrypt from "bcrypt";
-import { RefreshTokenService } from "../services/refreshTokenService.js";
-import { UserRepository } from "../repositories/user.Repository.js";
+import { UserService } from "./user.service.js";
 import { 
   AuthRequest, 
   ApiResponse, 
   ChangePasswordRequest 
-} from "../types/index.js";
-import { asyncHandler } from "../middlewares/errorHandler.js";
+} from "../../types/index.js";
+import { asyncHandler } from "../../middlewares/errorHandler.js";
 
 export class UserController {
-  private refreshTokenService: RefreshTokenService;
-  private userRepository: UserRepository;
+  private userService: UserService;
 
   constructor() {
-    this.refreshTokenService = new RefreshTokenService();
-    this.userRepository = new UserRepository();
+    this.userService = new UserService();
   }
 
   // 비밀번호 변경
@@ -27,15 +23,7 @@ export class UserController {
       throw new Error("사용자 ID가 없습니다");
     }
 
-    // 새 비밀번호 해시화
-    const saltRounds = 12;
-    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-
-    // 비밀번호 업데이트
-    await this.userRepository.updatePassword(userId, hashedNewPassword);
-
-    // 보안 강화: 비밀번호 변경 시 모든 RefreshToken 무효화
-    await this.refreshTokenService.revokeAllUserTokens(userId);
+    await this.userService.changePassword(userId, newPassword);
 
     const response: ApiResponse = {
       success: true,
@@ -53,8 +41,7 @@ export class UserController {
       throw new Error("사용자 ID가 없습니다");
     }
 
-    // 사용자 삭제 (CASCADE로 인해 관련 데이터도 함께 삭제됨)
-    await this.userRepository.delete(userId);
+    await this.userService.deleteAccount(userId);
 
     const response: ApiResponse = {
       success: true,
