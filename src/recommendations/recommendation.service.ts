@@ -1,4 +1,4 @@
-import ItemConditionRepository from "../Repositories/itemCondition.repository.js";
+import ItemConditionRepository from "../repositories/itemCondition.repository.js";
 import { Answer } from "../types/answer.js";
 
 export default class RecommendationService {
