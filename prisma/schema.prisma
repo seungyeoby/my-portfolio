@@ -9,131 +9,186 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model ItemCondition{
-  itemConditionId Int @id @default(autoincrement()) @map("item_condition_id")
-  itemId Int @map("item_id")
-  conditionValue String @map("condition_value")
-  item Item @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
-  @@map("item_conditions")
-}
-model Item{
-  itemId Int @id @default(autoincrement()) @map("item_id")
-  categoryId Int @map("category_id")
-  itemLabel String @map("item_label")
-  clickCount Int @map("click_count")
-  itemCategory ItemCategory @relation(fields: [categoryId], references: [categoryId])
-  itemConditions ItemCondition[]
-  checklistItems ChecklistItem[]
-  itemReviews ItemReview[]
-  @@map("items")
-}
-model ItemCategory{
-  categoryId Int @id @default(autoincrement()) @map("category_id")
-  categoryLabel String @unique @map("category_label")
-  items Item[]
-  @@map("item_category")
-}
-model ChecklistItem{
-  checklistItemId Int @id @default(autoincrement()) @map("checklist_item_id")
-  checklistId Int @map("checklist_id")
-  itemId Int @map("item_id")
-  removedByUser Boolean @default(false) @map("removed_by_user")
-  packingBag PackingBag @default(HOLD) @map("packing_bag")
-  item Item @relation(fields: [itemId], references: [itemId])
-  checklist Checklist @relation(fields: [checklistId], references: [checklistId], onDelete: Cascade)
-  @@map("checklist_items")
-}
-enum PackingBag {
-  HAND
-  HOLD
-}
-model Checklist{
-  checklistId Int @id @default(autoincrement()) @map("checklist_id")
-  userId Int @map("user_id")
-  title String @map("title")
-  travelType TravelType @default(ACTIVITY) @map("travel_type")
-  cityId Int @map("city_id")
-  travelStart DateTime @db.Date @map("travel_start")
-  travelEnd DateTime @db.Date @map("travel_end")
-  createdAt DateTime @default(now()) @map("created_at")
-  isShared Boolean @default(false) @map("is_shared")
-  likes Int @default(0) @map("likes")
-  content String? @map("content")
-  updatedAt DateTime @updatedAt @db.DateTime @map("updated_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
-  checklistItems ChecklistItem[]
-  cities City @relation(fields: [cityId], references: [cityId])
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  itemReviews ItemReview[]
-  @@map("checklists")
-}
-enum TravelType{
-  ACTIVITY
-  RECREATION
-  EXPLORATION
-  BUSINESS
-}
-model User{
-  userId Int @id @default(autoincrement()) @map("user_id")
-  nickname String @unique @map("nickname")
-  email String @unique @map("email")
-  password String @map("password")
-  birthDate DateTime @db.Date @map("birth_date")
-  profilePhoto String? @map("profile_photo")
-  gender Gender @map("gender")
-  authority Authority @map("authority")
-  checklists Checklist[]
-  itemReviews ItemReview[]
-  favoriteItemReviews UserFavoriteItemReview[]
+
+// User 모델 (ERD의 users 테이블)
+model User {
+  userId        BigInt    @id @default(autoincrement()) @map("user_id")
+  nickname      String    @unique
+  email         String    @unique
+  password      String
+  birthDate     DateTime  @map("birth_date") @db.Date
+  profilePhoto  String?   @map("profile_photo")
+  gender        Gender?
+  authority     Authority @default(USER)
+
+  // 관계
+  favoriteItems UserFavoriteItem[] @relation("UserFavoriteItems")
+  reviews       ItemReview[]
+  checklists    Checklist[]
+
   @@map("users")
 }
+
+// Gender enum (ERD에 따라)
 enum Gender {
   MALE
   FEMALE
-  NONSPECIFIED
+  OTHER
 }
+
+// Authority enum (ERD에 따라)
 enum Authority {
   USER
   ADMIN
 }
-model ItemReview{
-  reviewId Int @id @default(autoincrement()) @map("review_id")
-  userId Int @map("user_id")
-  title String @map("title")
-  checklistId Int @map("checklist_id")
-  content String @db.Text @map("content")
-  image String? @map("image")
-  likes Int @default(0) @map("likes")
-  itemId Int @map("item_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
-  checklist Checklist @relation(fields: [checklistId], references: [checklistId])
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  item Item @relation(fields: [itemId], references: [itemId])
-  favoriteItemReviews UserFavoriteItemReview[]
+
+// UserFavoriteItem 모델 (ERD의 user_favorite_item_r 테이블)
+model UserFavoriteItem {
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  reviewId    BigInt   @map("review_id")
+  favoritedAt DateTime @map("favorited_at") @db.Date
+  deletedAt   DateTime? @map("deleted_at") @db.Date
+
+  user        User     @relation("UserFavoriteItems", fields: [userId], references: [userId])
+  review      ItemReview @relation(fields: [reviewId], references: [reviewId])
+
+  @@map("user_favorite_item_r")
+}
+
+// ItemReview 모델 (ERD의 item_reviews 테이블)
+model ItemReview {
+  reviewId    BigInt   @id @default(autoincrement()) @map("review_id")
+  userId      BigInt   @map("user_id")
+  title       String
+  content     String   @db.Text
+  image       String?
+  likes       BigInt
+  createdAt   DateTime @map("created_at") @db.Date
+  itemId      BigInt   @map("item_id")
+  deletedAt   DateTime? @map("deleted_at") @db.Date
+
+  user        User     @relation(fields: [userId], references: [userId])
+  item        Item     @relation(fields: [itemId], references: [itemId])
+  userFavoriteItems UserFavoriteItem[]
+
   @@map("item_reviews")
 }
-model UserFavoriteItemReview{
-  favoriteId Int @id @default(autoincrement()) @map("favorite_id")
-  userId Int @map("user_id")
-  reviewId Int @map("review_id")
-  favoritedAt DateTime @default(now()) @map("favorited_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  itemReview ItemReview @relation(fields: [reviewId], references: [reviewId])
-  @@unique([userId, reviewId])
-  @@map("user_favorite_item_reviews")
+
+// Item 모델 (ERD의 items 테이블)
+model Item {
+  itemId      BigInt   @id @default(autoincrement()) @map("item_id")
+  categoryId  BigInt   @map("category_id")
+  itemLabel   String   @map("item_label")
+
+  category    ItemCategory @relation(fields: [categoryId], references: [categoryId])
+  reviews     ItemReview[]
+  conditions  ItemCondition[]
+  checklistItems ChecklistItem[]
+
+  @@map("items")
 }
-model TravelTip{
-  tipId Int @id @default(autoincrement()) @map("tip_id")
-  title String @map("title")
-  content String @db.Text @map("content")
-  createdAt DateTime @default(now()) @map("created_at")
+
+// ItemCategory 모델 (ERD의 item_category 테이블)
+model ItemCategory {
+  categoryId   BigInt   @id @default(autoincrement()) @map("category_id")
+  categoryLabel String   @map("category_label")
+
+  items       Item[]
+
+  @@map("item_category")
+}
+
+// ItemCondition 모델 (ERD의 item_conditions 테이블)
+model ItemCondition {
+  id            BigInt   @id @default(autoincrement())
+  itemId        BigInt   @map("item_id")
+  conditionKey  ConditionKey @map("condition_key")
+  conditionValue String   @map("condition_value")
+
+  item          Item     @relation(fields: [itemId], references: [itemId])
+
+  @@map("item_conditions")
+}
+
+// ConditionKey enum
+enum ConditionKey {
+  NEW
+  USED
+  DAMAGED
+}
+
+// Checklist 모델 (ERD의 checklists 테이블)
+model Checklist {
+  checklistId   BigInt    @id @default(autoincrement()) @map("checklist_id")
+  userId        BigInt    @map("user_id")
+  title         String
+  travelType    TravelType @map("travel_type")
+  transportation Transportation @map("transportation")
+  withPet       Boolean   @map("with_pet")
+  withBaby      Boolean   @map("with_baby")
+  withElderly   Boolean   @map("with_elderly")
+  visitJapan    Boolean   @map("visit_japan")
+  cityId        BigInt?   @map("city_id")
+  travelStart   DateTime  @map("travel_start") @db.Date
+  travelEnd     DateTime  @map("travel_end") @db.Date
+  createdAt     DateTime  @map("created_at") @db.DateTime
+  isShared      Boolean   @map("is_shared")
+  content       String    @db.Text
+  likes         BigInt
+
+  user          User      @relation(fields: [userId], references: [userId])
+  city          City?     @relation(fields: [cityId], references: [cityId])
+  checklistItems ChecklistItem[]
+
+  @@map("checklists")
+}
+
+// TravelType enum
+enum TravelType {
+  BUSINESS
+  LEISURE
+  ADVENTURE
+}
+
+// Transportation enum
+enum Transportation {
+  CAR
+  PLANE
+  TRAIN
+  BUS
+}
+
+// City 모델 (ERD의 cities 테이블)
+model City {
+  cityId    BigInt   @id @default(autoincrement()) @map("city_id")
+  cityName  String   @map("city_name")
+
+  checklists Checklist[]
+
+  @@map("cities")
+}
+
+// TravelTip 모델 (ERD의 travel_tips 테이블)
+model TravelTip {
+  id        BigInt   @id @default(autoincrement())
+  title     String
+  content   String   @db.Text
+  category  String
+
   @@map("travel_tips")
 }
-model City{
-  cityId Int @id @default(autoincrement()) @map("city_id")
-  cityName String @map("city_name")
-  checklist Checklist[]
-  @@map("cities")
+
+// ChecklistItem 모델 (ERD의 checklist_items 테이블)
+model ChecklistItem {
+  id          BigInt   @id @default(autoincrement())
+  checklistId BigInt   @map("checklist_id")
+  itemId      BigInt   @map("item_id")
+  addedByUser Boolean  @map("added_by_user")
+  removedByUser Boolean @map("removed_by_user")
+
+  checklist   Checklist @relation(fields: [checklistId], references: [checklistId])
+  item        Item     @relation(fields: [itemId], references: [itemId])
+
+  @@map("checklist_items")
 }
