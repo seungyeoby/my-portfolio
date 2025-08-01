@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import travelRoutes from "./routes/travel.js";
+import { TokenCleanupScheduler } from "./utils/tokenCleanup.js";
 
 // 환경 변수 로드
 dotenv.config();
@@ -90,4 +91,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 API Documentation: http://localhost:${PORT}/api`);
+  
+  // 토큰 정리 스케줄러 시작
+  TokenCleanupScheduler.start();
 });

@@ -10,6 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// RefreshToken 모델 (보안 강화용)
+model RefreshToken {
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  token       String   @unique
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  isRevoked   Boolean  @default(false) @map("is_revoked")
+
+  user        User     @relation("UserRefreshTokens", fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
 // User 모델 (ERD의 users 테이블)
 model User {
   userId        BigInt    @id @default(autoincrement()) @map("user_id")
@@ -25,6 +39,7 @@ model User {
   favoriteItems UserFavoriteItem[] @relation("UserFavoriteItems")
   reviews       ItemReview[]
   checklists    Checklist[]
+  refreshTokens RefreshToken[] @relation("UserRefreshTokens")
 
   @@map("users")
 }

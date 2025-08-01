@@ -1,83 +1,20 @@
 import express, { Request, Response } from "express";
-import { query, validationResult, body, param } from "express-validator";
 import prisma from "../lib/prisma.js";
+import { 
+  travelInfoValidation,
+  createTravelTipValidation,
+  updateTravelTipValidation,
+  deleteTravelTipValidation,
+  getTravelTipByIdValidation
+} from "../middleware/validation.js";
 
 const router = express.Router();
-
-// 여행 정보 조회 유효성 검사 규칙
-const travelInfoValidation = [
-  query("category")
-    .optional()
-    .isIn(["PASSPORT", "ELECTRONICS", "CLOTHING", "DOCUMENTS", "MONEY", "HEALTH", "TRANSPORTATION", "CULTURE"])
-    .withMessage("유효한 카테고리를 선택해주세요"),
-];
-
-// 여행 정보 생성 유효성 검사 규칙
-const createTravelTipValidation = [
-  body("title")
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage("제목은 1자 이상 100자 이하여야 합니다"),
-  body("content")
-    .trim()
-    .isLength({ min: 1, max: 1000 })
-    .withMessage("내용은 1자 이상 1000자 이하여야 합니다"),
-  body("category")
-    .isIn(["PASSPORT", "ELECTRONICS", "CLOTHING", "DOCUMENTS", "MONEY", "HEALTH", "TRANSPORTATION", "CULTURE"])
-    .withMessage("유효한 카테고리를 선택해주세요"),
-];
-
-// 여행 정보 수정 유효성 검사 규칙
-const updateTravelTipValidation = [
-  param("id")
-    .isInt({ min: 1 })
-    .withMessage("유효한 ID를 입력해주세요"),
-  body("title")
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage("제목은 1자 이상 100자 이하여야 합니다"),
-  body("content")
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 1000 })
-    .withMessage("내용은 1자 이상 1000자 이하여야 합니다"),
-  body("category")
-    .optional()
-    .isIn(["PASSPORT", "ELECTRONICS", "CLOTHING", "DOCUMENTS", "MONEY", "HEALTH", "TRANSPORTATION", "CULTURE"])
-    .withMessage("유효한 카테고리를 선택해주세요"),
-];
-
-// 여행 정보 삭제 유효성 검사 규칙
-const deleteTravelTipValidation = [
-  param("id")
-    .isInt({ min: 1 })
-    .withMessage("유효한 ID를 입력해주세요"),
-];
-
-// 개별 여행정보 조회 유효성 검사 규칙
-const getTravelTipByIdValidation = [
-  param("id")
-    .isInt({ min: 1 })
-    .withMessage("유효한 ID를 입력해주세요"),
-];
 
 // 여행 정보 조회 API (전체 리스트)
 router.get("/travel-info", travelInfoValidation, async (req: Request, res: Response) => {
   try {
     console.log("여행 정보 조회 요청 받음:", req.query);
     
-    // 유효성 검사 오류 확인
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("유효성 검사 오류:", errors.array());
-      return res.status(400).json({
-        success: false,
-        message: "유효한 카테고리를 선택해주세요",
-        errors: errors.array(),
-      });
-    }
-
     const { category } = req.query;
     console.log("카테고리 필터:", category);
 
@@ -122,17 +59,6 @@ router.get("/travel-info/:id", getTravelTipByIdValidation, async (req: Request, 
   try {
     console.log("개별 여행정보 조회 요청 받음:", req.params);
     
-    // 유효성 검사 오류 확인
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("유효성 검사 오류:", errors.array());
-      return res.status(400).json({
-        success: false,
-        message: "유효한 ID를 입력해주세요",
-        errors: errors.array(),
-      });
-    }
-
     const { id } = req.params;
     console.log("조회할 여행정보 ID:", id);
 
@@ -177,17 +103,6 @@ router.post("/travel-info", createTravelTipValidation, async (req: Request, res:
   try {
     console.log("여행 정보 생성 요청 받음:", req.body);
     
-    // 유효성 검사 오류 확인
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("유효성 검사 오류:", errors.array());
-      return res.status(400).json({
-        success: false,
-        message: "입력 정보를 확인해주세요",
-        errors: errors.array(),
-      });
-    }
-
     const { title, content, category } = req.body;
     console.log("파싱된 데이터:", { title, content, category });
 
@@ -226,17 +141,6 @@ router.patch("/travel-info/:id", updateTravelTipValidation, async (req: Request,
   try {
     console.log("여행 정보 수정 요청 받음:", { id: req.params.id, body: req.body });
     
-    // 유효성 검사 오류 확인
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("유효성 검사 오류:", errors.array());
-      return res.status(400).json({
-        success: false,
-        message: "입력 정보를 확인해주세요",
-        errors: errors.array(),
-      });
-    }
-
     const { id } = req.params;
     const { title, content, category } = req.body;
     console.log("파싱된 데이터:", { id, title, content, category });
@@ -306,17 +210,6 @@ router.delete("/travel-info/:id", deleteTravelTipValidation, async (req: Request
   try {
     console.log("여행 정보 삭제 요청 받음:", req.params);
     
-    // 유효성 검사 오류 확인
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("유효성 검사 오류:", errors.array());
-      return res.status(400).json({
-        success: false,
-        message: "유효한 ID를 입력해주세요",
-        errors: errors.array(),
-      });
-    }
-
     const { id } = req.params;
     console.log("삭제할 여행정보 ID:", id);
 
