@@ -7,7 +7,6 @@ export default class ItemConditionRepository {
         select: {
           item: {
             select: {
-              categoryId: true,
               itemId: true,
               itemLabel: true,
             },

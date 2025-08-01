@@ -8,6 +8,8 @@ export default class RecommendationService {
   }
 
   async getRecommendedItemIds(answer: Answer) {
+    const { travelStart, travelEnd, ...rest } = answer;
+
     // 계절 계산
     const SEASON_MAP: Record<string, number[]> = {
       winter: [12, 1, 2],
@@ -16,8 +18,8 @@ export default class RecommendationService {
       fall: [9, 10, 11],
     };
 
-    const startDate = new Date(answer.travel_start);
-    const endDate = new Date(answer.travel_end);
+    const startDate = new Date(answer.travelStart);
+    const endDate = new Date(answer.travelEnd);
 
     const monthsSet = new Set<number>();
     let current: Date = new Date(startDate);
@@ -39,28 +41,32 @@ export default class RecommendationService {
     });
 
     // 옵션들 전부 가져오기
-    const options: string[] = [...seasons];
-    Object.entries(answer).forEach(([key, value]) => {
+    const options: string[] = [...seasons, "default"];
+    Object.entries(rest).forEach(([key, value]) => {
       if (typeof value === "string") {
         options.push(value.toLowerCase());
       } else if (value === true) {
         options.push(key);
       }
     });
+    console.log(
+      "🚀 ~ RecommendationService ~ getRecommendedItemIds ~ options:",
+      options
+    );
 
-    const recommendedItemIds =
-      await this.itemConditionRepo.getRecommendedItemIds(options);
+    const recommendedItems = await this.itemConditionRepo.getRecommendedItemIds(
+      options
+    );
 
-    const uniqueItemMap = new Map();
-    for (const { item } of recommendedItemIds) {
-      if (!uniqueItemMap.has(item.itemId)) {
-        const { categoryId, ...rest } = item;
-        uniqueItemMap.set(item.itemId, rest);
-      }
-    }
+    const uniqueRecommendedItems = Array.from(
+      new Map(
+        recommendedItems.map(({ item }) => [
+          item.itemId,
+          { itemId: item.itemId, itemLabel: item.itemLabel },
+        ])
+      ).values()
+    );
 
-    const recommendedItems = [...uniqueItemMap.values()];
-
-    return recommendedItems;
+    return uniqueRecommendedItems;
   }
 }
