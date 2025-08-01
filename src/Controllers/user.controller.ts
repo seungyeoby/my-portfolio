@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import UserService from "../services/user.service.js";
+import UserService from "../Services/user.service.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { PackingBag } from "@prisma/client";
 
