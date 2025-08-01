@@ -40,15 +40,13 @@ export default class RecommendationService {
 
     // 옵션들 전부 가져오기
     const options: string[] = [...seasons];
-    for (const k of Object.keys(answer) as (keyof Answer)[]) {
-      switch (typeof answer[k]) {
-        case "string":
-          options.push(answer[k].toLowerCase());
-          break;
-        case "boolean":
-          if (answer[k]) options.push(k);
+    Object.entries(answer).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        options.push(value.toLowerCase());
+      } else if (value === true) {
+        options.push(key);
       }
-    }
+    });
 
     const recommendedItemIds =
       await this.itemConditionRepo.getRecommendedItemIds(options);
