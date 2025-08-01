@@ -17,36 +17,37 @@ export class AppError extends Error {
 
 // Prisma 에러 처리
 const handlePrismaError = (error: any): AppError => {
-  if (error.code === 'P2002') {
-    // Unique constraint violation
-    const field = error.meta?.target?.[0] || 'field';
-    return new AppError(`${field}이(가) 이미 사용 중입니다`, 409);
+  switch (error.code) {
+    case 'P2002':
+      // Unique constraint violation
+      const field = error.meta?.target?.[0] || 'field';
+      return new AppError(`${field}이(가) 이미 사용 중입니다`, 409);
+    
+    case 'P2025':
+      // Record not found
+      return new AppError('요청한 데이터를 찾을 수 없습니다', 404);
+    
+    case 'P2003':
+      // Foreign key constraint violation
+      return new AppError('관련된 데이터가 존재하지 않습니다', 400);
+    
+    default:
+      return new AppError('데이터베이스 오류가 발생했습니다', 500);
   }
-  
-  if (error.code === 'P2025') {
-    // Record not found
-    return new AppError('요청한 데이터를 찾을 수 없습니다', 404);
-  }
-  
-  if (error.code === 'P2003') {
-    // Foreign key constraint violation
-    return new AppError('관련된 데이터가 존재하지 않습니다', 400);
-  }
-
-  return new AppError('데이터베이스 오류가 발생했습니다', 500);
 };
 
 // JWT 에러 처리
 const handleJWTError = (error: any): AppError => {
-  if (error.name === 'JsonWebTokenError') {
-    return new AppError('유효하지 않은 토큰입니다', 401);
+  switch (error.name) {
+    case 'JsonWebTokenError':
+      return new AppError('유효하지 않은 토큰입니다', 401);
+    
+    case 'TokenExpiredError':
+      return new AppError('토큰이 만료되었습니다', 401);
+    
+    default:
+      return new AppError('토큰 인증 오류가 발생했습니다', 401);
   }
-  
-  if (error.name === 'TokenExpiredError') {
-    return new AppError('토큰이 만료되었습니다', 401);
-  }
-
-  return new AppError('토큰 인증 오류가 발생했습니다', 401);
 };
 
 // Validation 에러 처리
@@ -58,19 +59,19 @@ const handleValidationError = (error: any): AppError => {
 
 // Multer 에러 처리 (파일 업로드)
 const handleMulterError = (error: any): AppError => {
-  if (error.code === 'LIMIT_FILE_SIZE') {
-    return new AppError('파일 크기가 너무 큽니다', 400);
+  switch (error.code) {
+    case 'LIMIT_FILE_SIZE':
+      return new AppError('파일 크기가 너무 큽니다', 400);
+    
+    case 'LIMIT_FILE_COUNT':
+      return new AppError('업로드할 수 있는 파일 개수를 초과했습니다', 400);
+    
+    case 'LIMIT_UNEXPECTED_FILE':
+      return new AppError('예상하지 못한 파일이 업로드되었습니다', 400);
+    
+    default:
+      return new AppError('파일 업로드 중 오류가 발생했습니다', 400);
   }
-  
-  if (error.code === 'LIMIT_FILE_COUNT') {
-    return new AppError('업로드할 수 있는 파일 개수를 초과했습니다', 400);
-  }
-  
-  if (error.code === 'LIMIT_UNEXPECTED_FILE') {
-    return new AppError('예상하지 못한 파일이 업로드되었습니다', 400);
-  }
-
-  return new AppError('파일 업로드 중 오류가 발생했습니다', 400);
 };
 
 // 전역 에러 핸들러 미들웨어
@@ -87,17 +88,28 @@ export const errorHandler = (
     appError = error;
   } else {
     // 다른 타입의 에러를 AppError로 변환
-    if (error.name === 'PrismaClientKnownRequestError') {
-      appError = handlePrismaError(error);
-    } else if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-      appError = handleJWTError(error);
-    } else if (error.name === 'ValidationError') {
-      appError = handleValidationError(error);
-    } else if (error.name === 'MulterError') {
-      appError = handleMulterError(error);
-    } else {
-      // 알 수 없는 에러
-      appError = new AppError('서버 내부 오류가 발생했습니다', 500, false);
+    switch (error.name) {
+      case 'PrismaClientKnownRequestError':
+        appError = handlePrismaError(error);
+        break;
+      
+      case 'JsonWebTokenError':
+      case 'TokenExpiredError':
+        appError = handleJWTError(error);
+        break;
+      
+      case 'ValidationError':
+        appError = handleValidationError(error);
+        break;
+      
+      case 'MulterError':
+        appError = handleMulterError(error);
+        break;
+      
+      default:
+        // 알 수 없는 에러
+        appError = new AppError('서버 내부 오류가 발생했습니다', 500, false);
+        break;
     }
   }
 
