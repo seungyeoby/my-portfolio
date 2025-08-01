@@ -7,7 +7,7 @@ export default class ItemsRepository {
         where: {
           itemConditions: {
             none: {
-              conditionValue: "non-ranking",
+              conditionValue: "nonRanking",
             },
           },
         },
