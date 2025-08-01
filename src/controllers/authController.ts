@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { RefreshTokenService } from "../services/refreshTokenService.js";
-import { UserRepository } from "../repositories/userRepository.js";
+import { UserRepository } from "../repositories/user.Repository.js";
 import { uploadProfilePhoto, getProfilePhotoPath, getDefaultProfilePhoto } from "../middlewares/upload.js";
 import { 
   AuthRequest, 
