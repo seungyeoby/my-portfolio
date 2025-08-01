@@ -1,6 +1,6 @@
 import { Router } from "express";
 import upload from "../middlewares/upload.js";
-import userController from "./user.controller.js";
+import userController from "./my.controller.js";
 import { authenticateToken } from "../middlewares/authenticate.js";
 import {
   checklistValidator,

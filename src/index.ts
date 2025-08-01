@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import cors from "cors";
-import userRouter from "./user/user.router.js";
+import myRouter from "./my/my.router.js";
 import errorHandlingMiddleware from "./middlewares/error-handling.js";
 
 const app: Express = express();
@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
-app.use("/my", userRouter);
+app.use("/my", myRouter);
 app.use("/uploads", express.static("uploads"));
 app.use(errorHandlingMiddleware);
 
