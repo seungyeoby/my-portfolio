@@ -1,6 +1,6 @@
 import express, { Express } from "express";
-import recommendationRouter from "./Routers/recommendationRouter.js";
-import errorHandlingMiddleware from "./Middlewares/error-handling.js";
+import recommendationRouter from "./routers/recommendationRouter.js";
+import errorHandlingMiddleware from "./middlewares/error-handling.js";
 import cors from "cors";
 
 const app: Express = express();

@@ -1,4 +1,4 @@
-import RecommendationService from "../Services/recommendation.service.js";
+import RecommendationService from "../services/recommendation.service.js";
 import { Answer } from "../types/answer.js";
 import { Request, Response } from "express";
 
