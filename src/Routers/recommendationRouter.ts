@@ -1,5 +1,5 @@
 import { Router } from "express";
-import recommendationController from "../controllers/recommendation.controller.js";
+import recommendationController from "../Controllers/recommendation.controller.js";
 
 const router: Router = Router();
 
