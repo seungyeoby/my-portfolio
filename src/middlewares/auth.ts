@@ -1,13 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
-interface AuthRequest extends Request {
-  user?: {
-    userId: number;
-    email: string;
-    authority: string;
-  };
-}
+import { AuthRequest, JWTPayload } from "../types/index.js";
 
 // JWT 토큰 검증 미들웨어
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -26,11 +19,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key") as {
-      userId: number;
-      email: string;
-      authority: string;
-    };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key") as JWTPayload;
     
     req.user = decoded;
     next();

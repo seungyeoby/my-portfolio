@@ -6,7 +6,7 @@ import {
   updateTravelTipValidation,
   deleteTravelTipValidation,
   getTravelTipByIdValidation
-} from "../middleware/validation.js";
+} from "../middlewares/validation.js";
 
 const router = express.Router();
 
