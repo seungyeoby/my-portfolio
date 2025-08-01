@@ -1,7 +1,7 @@
-import UserRepository from "../repositories/user.repository.js";
-import ChecklistItemsRepository from "../repositories/checklistItems.repository.js";
-import ReviewsRepository from "../repositories/reviews.repository.js";
-import ChecklistsRepository from "../repositories/checklist.repository.js";
+import UserRepository from "../Repositories/user.repository.js";
+import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
+import ReviewsRepository from "../Repositories/reviews.repository.js";
+import ChecklistsRepository from "../Repositories/checklist.repository.js";
 import {
   Checklist,
   ChangedChecklistItems,
