@@ -1,20 +1,14 @@
 import prisma from "../lib/prisma.js";
 import { Prisma } from "@prisma/client";
-import { Checklist, Item } from "../types/checklist.js";
+import { Item, ChecklistDTO } from "../types/checklist.js";
 
 export default class ChecklistsRepository {
-  async saveChecklist(items: Item[], checklistInfo: Omit<Checklist, "items">) {
+  async saveChecklist(items: Item[], checklistInfo: ChecklistDTO) {
     try {
-      const parsedChecklistInfo = {
-        ...checklistInfo,
-        travelStart: new Date(checklistInfo.travelStart),
-        travelEnd: new Date(checklistInfo.travelEnd),
-      };
-
       await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // 1. 체크리스트 저장
         const newChecklist = await tx.checklist.create({
-          data: parsedChecklistInfo,
+          data: checklistInfo,
         });
 
         // 2. 아이템 저장

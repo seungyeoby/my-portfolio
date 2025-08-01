@@ -25,3 +25,11 @@ export type ChangedChecklistItems = {
   removedItems: number[];
   packingBagChangedItems: number[];
 };
+
+export type ChecklistDTO = Omit<
+  Checklist,
+  "items" | "travelStart" | "travelEnd"
+> & {
+  travelStart: Date;
+  travelEnd: Date;
+};

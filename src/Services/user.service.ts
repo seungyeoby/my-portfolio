@@ -1,10 +1,16 @@
-import UserRepository from "../Repositories/user.repository.js";
-import ChecklistItemsRepository from "../Repositories/checklistItems.repository.js";
-import ReviewsRepository from "../Repositories/reviews.repository.js";
-import ChecklistsRepository from "../Repositories/checklist.repository.js";
-import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
+import UserRepository from "../repositories/user.repository.js";
+import ChecklistItemsRepository from "../repositories/checklistItems.repository.js";
+import ReviewsRepository from "../repositories/reviews.repository.js";
+import ChecklistsRepository from "../repositories/checklist.repository.js";
+import {
+  Checklist,
+  ChangedChecklistItems,
+  ChecklistDTO,
+} from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
+import path from "path";
+import fs from "fs";
 
 export default class UserService {
   private userRepo: UserRepository;
@@ -18,6 +24,7 @@ export default class UserService {
       (this.checklistsRepo = new ChecklistsRepository()),
       (this.reviewsRepo = new ReviewsRepository());
   }
+
   // 개인정보 조회
   async getPublicPersonalInfo(userId: number) {
     let userInfo = await this.userRepo.getPublicPersonalInfo(userId);
@@ -41,6 +48,17 @@ export default class UserService {
       updatedInfo.birthDate = new Date(updatedInfo.birthDate);
     }
 
+    if (updatedInfo.profilePhoto) {
+      let user = await this.userRepo.getPublicPersonalInfo(userId);
+
+      if (user?.profilePhoto) {
+        const oldPath = path.join(process.cwd(), user.profilePhoto);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+    }
+
     const updatedUser = await this.userRepo.updatePersonalInfo(
       userId,
       updatedInfo
@@ -52,7 +70,12 @@ export default class UserService {
   // 체크리스트 생성
   async createChecklist(checklist: Checklist) {
     const { items, ...checklistInfo } = checklist;
-    await this.checklistsRepo.saveChecklist(items, checklistInfo);
+    const parsedChecklistInfo: ChecklistDTO = {
+      ...checklistInfo,
+      travelStart: new Date(checklistInfo.travelStart),
+      travelEnd: new Date(checklistInfo.travelEnd),
+    };
+    await this.checklistsRepo.saveChecklist(items, parsedChecklistInfo);
   }
 
   async deleteChecklist(checklistId: number) {
