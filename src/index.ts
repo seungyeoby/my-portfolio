@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import recommendationRouter from "./routers/recommendationRouter.js";
+import recommendationRouter from "./recommendations/recommendation.router.js";
 import errorHandlingMiddleware from "./middlewares/error-handling.js";
 import cors from "cors";
 
