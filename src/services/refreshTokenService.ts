@@ -1,10 +1,16 @@
 import jwt from "jsonwebtoken";
-import prisma from "../lib/prisma.js";
 import crypto from "crypto";
+import { RefreshTokenRepository } from "../repositories/refreshTokenRepository.js";
 
 export class RefreshTokenService {
+  private refreshTokenRepository: RefreshTokenRepository;
+
+  constructor() {
+    this.refreshTokenRepository = new RefreshTokenRepository();
+  }
+
   // RefreshToken 생성 및 저장
-  static async createRefreshToken(userId: number): Promise<string> {
+  async createRefreshToken(userId: number): Promise<string> {
     // 랜덤 토큰 생성 (JWT 대신 암호학적으로 안전한 랜덤 문자열 사용)
     const token = crypto.randomBytes(64).toString('hex');
     
@@ -13,25 +19,20 @@ export class RefreshTokenService {
     expiresAt.setDate(expiresAt.getDate() + 30);
 
     // 데이터베이스에 저장
-    await prisma.refreshToken.create({
-      data: {
-        userId: BigInt(userId),
-        token,
-        expiresAt,
-      },
+    await this.refreshTokenRepository.create({
+      userId,
+      token,
+      expiresAt,
     });
 
     return token;
   }
 
   // RefreshToken 검증
-  static async verifyRefreshToken(token: string): Promise<{ userId: number; isValid: boolean }> {
+  async verifyRefreshToken(token: string): Promise<{ userId: number; isValid: boolean }> {
     try {
       // 데이터베이스에서 토큰 조회
-      const refreshToken = await prisma.refreshToken.findUnique({
-        where: { token },
-        include: { user: true },
-      });
+      const refreshToken = await this.refreshTokenRepository.findByToken(token);
 
       if (!refreshToken) {
         return { userId: 0, isValid: false };
@@ -53,12 +54,9 @@ export class RefreshTokenService {
   }
 
   // RefreshToken 무효화 (로그아웃 시)
-  static async revokeRefreshToken(token: string): Promise<boolean> {
+  async revokeRefreshToken(token: string): Promise<boolean> {
     try {
-      await prisma.refreshToken.update({
-        where: { token },
-        data: { isRevoked: true },
-      });
+      await this.refreshTokenRepository.revoke(token);
       return true;
     } catch (error) {
       console.error("RefreshToken 무효화 오류:", error);
@@ -67,15 +65,9 @@ export class RefreshTokenService {
   }
 
   // 사용자의 모든 RefreshToken 무효화 (보안 강화)
-  static async revokeAllUserTokens(userId: number): Promise<boolean> {
+  async revokeAllUserTokens(userId: number): Promise<boolean> {
     try {
-      await prisma.refreshToken.updateMany({
-        where: { 
-          userId: BigInt(userId),
-          isRevoked: false 
-        },
-        data: { isRevoked: true },
-      });
+      await this.refreshTokenRepository.revokeAllByUserId(userId);
       return true;
     } catch (error) {
       console.error("사용자 토큰 무효화 오류:", error);
@@ -84,16 +76,9 @@ export class RefreshTokenService {
   }
 
   // 만료된 토큰 정리 (정기적으로 실행)
-  static async cleanupExpiredTokens(): Promise<number> {
+  async cleanupExpiredTokens(): Promise<number> {
     try {
-      const result = await prisma.refreshToken.deleteMany({
-        where: {
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { isRevoked: true }
-          ]
-        }
-      });
+      const result = await this.refreshTokenRepository.deleteExpired();
       return result.count;
     } catch (error) {
       console.error("만료된 토큰 정리 오류:", error);
@@ -102,7 +87,7 @@ export class RefreshTokenService {
   }
 
   // 토큰 재발급 (Refresh Token Rotation)
-  static async rotateRefreshToken(oldToken: string): Promise<{ newToken: string; userId: number } | null> {
+  async rotateRefreshToken(oldToken: string): Promise<{ newToken: string; userId: number } | null> {
     try {
       // 기존 토큰 검증
       const { userId, isValid } = await this.verifyRefreshToken(oldToken);

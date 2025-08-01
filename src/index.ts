@@ -4,10 +4,11 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/user.js";
-import travelRoutes from "./routes/travel.js";
+import authRoutes from "./routers/auth.js";
+import userRoutes from "./routers/user.js";
+import travelRoutes from "./routers/travel.js";
 import { TokenCleanupScheduler } from "./utils/tokenCleanup.js";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 
 // 환경 변수 로드
 dotenv.config();
@@ -71,27 +72,17 @@ app.get("/", (req, res) => {
   });
 });
 
-// 404 에러 핸들러
-app.use("*", (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "요청한 리소스를 찾을 수 없습니다",
-  });
-});
+// 404 에러 핸들러 (모든 라우트 처리 후)
+app.use(notFoundHandler);
 
-// 전역 에러 핸들러
-app.use((err: any, req: any, res: any, next: any) => {
-  console.error("서버 오류:", err);
-  res.status(500).json({
-    success: false,
-    message: "서버 내부 오류가 발생했습니다",
-  });
-});
+// 전역 에러 핸들러 (모든 미들웨어 처리 후)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 API Documentation: http://localhost:${PORT}/api`);
   
   // 토큰 정리 스케줄러 시작
-  TokenCleanupScheduler.start();
+  const tokenCleanupScheduler = new TokenCleanupScheduler();
+  tokenCleanupScheduler.start();
 });

@@ -2,16 +2,21 @@ import { RefreshTokenService } from "../services/refreshTokenService.js";
 
 // 만료된 토큰 정리 스케줄러
 export class TokenCleanupScheduler {
-  private static intervalId: NodeJS.Timeout | null = null;
+  private intervalId: NodeJS.Timeout | null = null;
+  private refreshTokenService: RefreshTokenService;
+
+  constructor() {
+    this.refreshTokenService = new RefreshTokenService();
+  }
 
   // 스케줄러 시작 (매일 자정에 실행)
-  static start() {
+  start(): void {
     console.log("토큰 정리 스케줄러 시작");
     
     // 매일 자정에 실행
     this.intervalId = setInterval(async () => {
       try {
-        const cleanedCount = await RefreshTokenService.cleanupExpiredTokens();
+        const cleanedCount = await this.refreshTokenService.cleanupExpiredTokens();
         console.log(`만료된 토큰 ${cleanedCount}개 정리 완료`);
       } catch (error) {
         console.error("토큰 정리 중 오류:", error);
@@ -23,7 +28,7 @@ export class TokenCleanupScheduler {
   }
 
   // 스케줄러 중지
-  static stop() {
+  stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
@@ -32,9 +37,9 @@ export class TokenCleanupScheduler {
   }
 
   // 수동으로 토큰 정리 실행
-  static async runCleanup() {
+  async runCleanup(): Promise<number> {
     try {
-      const cleanedCount = await RefreshTokenService.cleanupExpiredTokens();
+      const cleanedCount = await this.refreshTokenService.cleanupExpiredTokens();
       console.log(`수동 토큰 정리 완료: ${cleanedCount}개`);
       return cleanedCount;
     } catch (error) {

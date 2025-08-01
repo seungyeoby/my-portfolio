@@ -12,4 +12,4 @@ router.put("/password", authenticateToken, changePasswordValidation, validateCur
 // 회원 탈퇴
 router.delete("/account", authenticateToken, userController.deleteAccount);
 
-export default router; 
+export default router;
