@@ -9,6 +9,7 @@ import {
 } from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import path from "path";
 import fs from "fs";
 
@@ -28,9 +29,11 @@ export default class UserService {
   // 개인정보 조회
   async getPublicPersonalInfo(userId: number) {
     let userInfo = await this.userRepo.getPublicPersonalInfo(userId);
+
     if (!userInfo) {
       throw new Error("UserNotFound");
     }
+
     if (userInfo.profilePhoto) {
       userInfo = {
         ...userInfo,

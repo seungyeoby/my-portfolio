@@ -7,8 +7,6 @@ export type Checklist = {
   travelType: TravelType;
   travelStart: string;
   travelEnd: string;
-  isShared?: boolean;
-  content?: string;
   items: Item[];
 };
 

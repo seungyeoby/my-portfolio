@@ -72,7 +72,11 @@ export default class ChecklistsRepository {
   async getChecklistByChecklistId(userId: number, checklistId: number) {
     try {
       return await prisma.checklist.findFirst({
-        where: { checklistId, userId, deletedAt: null },
+        where: {
+          checklistId,
+          userId,
+          deletedAt: { equals: null },
+        },
         select: {
           checklistId: true,
           title: true,
