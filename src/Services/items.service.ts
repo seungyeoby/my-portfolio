@@ -1,5 +1,5 @@
-import ItemsRepository from "../Repositories/items.repository.js";
-import ItemCategoryRepository from "../Repositories/itemCategory.repository.js";
+import ItemsRepository from "../repositories/items.repository.js";
+import ItemCategoryRepository from "../repositories/itemCategory.repository.js";
 import { Item, Items } from "../types/Items.js";
 
 export default class ItemService {

@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import cors from "cors";
-import itemRouter from "./Routers/itemsRouter.js";
-import errorHandlingMiddleware from "./Middlewares/error-handling.js";
+import itemRouter from "./routers/itemsRouter.js";
+import errorHandlingMiddleware from "./middlewares/error-handling.js";
 
 const app: Express = express();
 const PORT: 4000 = 4000;
