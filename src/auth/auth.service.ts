@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { RefreshTokenService } from "../../services/refreshTokenService.js";
-import { UserRepository } from "../../repositories/user.repository.js";
-import { uploadProfilePhoto, getProfilePhotoPath, getDefaultProfilePhoto } from "../../middlewares/upload.js";
+import { RefreshTokenService } from "../services/refreshTokenService.js";
+import { UserRepository } from "../repositories/user.repository.js";
+import { uploadProfilePhoto, getProfilePhotoPath, getDefaultProfilePhoto } from "../middlewares/upload.js";
 import { 
   User, 
   LoginRequest, 
   SignupRequest,
   JWTPayload 
-} from "../../types/index.js";
+} from "../types/index.js";
 
 export class AuthService {
   private refreshTokenService: RefreshTokenService;

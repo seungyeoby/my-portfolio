@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import authRoutes from "./modules/auth/auth.router.js";
-import userRoutes from "./modules/user/user.router.js";
-import travelRoutes from "./modules/travel/travel.router.js";
+import authRoutes from "./auth/auth.router.js";
+import userRoutes from "./user/user.router.js";
+import travelRoutes from "./travel/travel.router.js";
 import { TokenCleanupScheduler } from "./utils/tokenCleanup.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 

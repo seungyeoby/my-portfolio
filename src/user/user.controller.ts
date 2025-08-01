@@ -4,8 +4,8 @@ import {
   AuthRequest, 
   ApiResponse, 
   ChangePasswordRequest 
-} from "../../types/index.js";
-import { asyncHandler } from "../../middlewares/errorHandler.js";
+} from "../types/index.js";
+import { asyncHandler } from "../middlewares/errorHandler.js";
 
 export class UserController {
   private userService: UserService;
