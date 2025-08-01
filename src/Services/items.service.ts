@@ -1,12 +1,15 @@
-import type ItemsRepository from "../Repositories/items.repository.js";
-import type ItemCategoryRepository from "../Repositories/itemCategory.repository.js";
+import ItemsRepository from "../Repositories/items.repository.js";
+import ItemCategoryRepository from "../Repositories/itemCategory.repository.js";
 import { Item, Items } from "../types/Items.js";
 
 export default class ItemService {
-  constructor(
-    private itemRepo: ItemsRepository,
-    private itemCategoryRepo: ItemCategoryRepository
-  ) {}
+  private itemRepo: ItemsRepository;
+  private itemCategoryRepo: ItemCategoryRepository;
+
+  constructor() {
+    this.itemRepo = new ItemsRepository();
+    this.itemCategoryRepo = new ItemCategoryRepository();
+  }
 
   async getWholeItems() {
     const wholeItems = await this.itemCategoryRepo.getItems();

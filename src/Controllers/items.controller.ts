@@ -1,8 +1,11 @@
-import type ItemService from "../Services/items.service.js";
+import ItemService from "../Services/items.service.js";
 import { Request, Response } from "express";
 
-export default class ItemController {
-  constructor(private itemService: ItemService) {}
+class ItemController {
+  private itemService: ItemService;
+  constructor() {
+    this.itemService = new ItemService();
+  }
 
   getWholeItems = async (req: Request, res: Response) => {
     const result = await this.itemService.getWholeItems();
@@ -14,3 +17,5 @@ export default class ItemController {
     return res.status(200).send(result);
   };
 }
+
+export default new ItemController();

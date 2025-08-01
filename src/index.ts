@@ -1,10 +1,7 @@
 import express, { Express } from "express";
 import cors from "cors";
-import ItemCategoryRepository from "./Repositories/itemCategory.repository.js";
-import ItemsRepository from "./Repositories/items.repository.js";
-import ItemService from "./Services/items.service.js";
-import ItemController from "./Controllers/items.controller.js";
-import itemRouter from "./routers/itemsRouter.js";
+import itemRouter from "./Routers/itemsRouter.js";
+import errorHandlingMiddleware from "./Middlewares/error-handling.js";
 
 const app: Express = express();
 const PORT: 4000 = 4000;
@@ -14,14 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
-const itemCategoryRepository = new ItemCategoryRepository();
-const itemsRepository = new ItemsRepository();
+app.use("/items", itemRouter);
 
-const itemService = new ItemService(itemsRepository, itemCategoryRepository);
-
-const itemController = new ItemController(itemService);
-
-app.use("/items", itemRouter(itemController));
+app.use(errorHandlingMiddleware);
 
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
