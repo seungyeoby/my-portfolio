@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "./my.service.js";
+import { getProfilePhotoPath } from "../middlewares/upload.js";
 import { Checklist, ChangedChecklistItems } from "../types/checklist.js";
 import { PackingBag } from "@prisma/client";
 
@@ -27,7 +28,9 @@ class UserController {
     const userId = 1;
     const updatedInfo = {
       ...req.body,
-      profilePhoto: req.file ? `uploads/${req.file.filename}` : null,
+      profilePhoto: req.file
+        ? getProfilePhotoPath(req.file.filename)
+        : undefined,
     };
     const updatedUser = await this.userService.updatePersonalInfo(
       userId,

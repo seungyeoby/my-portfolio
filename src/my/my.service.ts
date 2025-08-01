@@ -9,7 +9,7 @@ import {
 } from "../types/checklist.js";
 import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
-import { Prisma } from "@prisma/client";
+import { deleteFile } from "../middlewares/upload.js";
 import path from "path";
 import fs from "fs";
 
@@ -55,10 +55,8 @@ export default class UserService {
       let user = await this.userRepo.getPublicPersonalInfo(userId);
 
       if (user?.profilePhoto) {
-        const oldPath = path.join(process.cwd(), user.profilePhoto);
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
+        const filename = path.basename(user.profilePhoto);
+        deleteFile(filename);
       }
     }
 

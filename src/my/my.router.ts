@@ -1,5 +1,5 @@
 import { Router } from "express";
-import upload from "../middlewares/upload.js";
+import { uploadProfilePhoto } from "../middlewares/upload.js";
 import userController from "./my.controller.js";
 import { authenticateToken } from "../middlewares/authenticate.js";
 import {
@@ -21,7 +21,7 @@ router.get(
 router.patch(
   "/",
   //authenticateToken,
-  upload.single("profilePhoto"),
+  uploadProfilePhoto,
   userController.updatePersonalInfo
 );
 
