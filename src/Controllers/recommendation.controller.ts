@@ -1,9 +1,13 @@
-import type RecommendationService from "../Services/recommendation.service.js";
+import RecommendationService from "../Services/recommendation.service.js";
 import { Answer } from "../types/answer.js";
 import { Request, Response } from "express";
 
-export default class RecommendationController {
-  constructor(private recommendationService: RecommendationService) {}
+class RecommendationController {
+  private recommendationService: RecommendationService;
+
+  constructor() {
+    this.recommendationService = new RecommendationService();
+  }
 
   getRecommendedItems = async (req: Request, res: Response) => {
     const answer: Answer = req.body;
@@ -12,3 +16,5 @@ export default class RecommendationController {
     return res.status(200).send(recommendedItems);
   };
 }
+
+export default new RecommendationController();

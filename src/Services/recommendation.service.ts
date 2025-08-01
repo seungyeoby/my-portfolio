@@ -1,8 +1,11 @@
-import type ItemConditionRepository from "../Repositories/itemCondition.repository.js";
+import ItemConditionRepository from "../Repositories/itemCondition.repository.js";
 import { Answer } from "../types/answer.js";
 
 export default class RecommendationService {
-  constructor(private itemConditionRepo: ItemConditionRepository) {}
+  private itemConditionRepo: ItemConditionRepository;
+  constructor() {
+    this.itemConditionRepo = new ItemConditionRepository();
+  }
 
   async getRecommendedItemIds(answer: Answer) {
     // 계절 계산
