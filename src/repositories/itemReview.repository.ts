@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-export default class ReviewsRepository {
+export default class itemReviewRepository {
   async getAllReviewsByUserId(userId: number) {
     try {
       return await prisma.itemReview.findMany({

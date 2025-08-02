@@ -1,6 +1,6 @@
 import UserRepository from "../repositories/user.repository.js";
 import ChecklistItemsRepository from "../repositories/checklistItems.repository.js";
-import ReviewsRepository from "../repositories/reviews.repository.js";
+import itemReviewRepository from "../repositories/itemReview.repository.js";
 import ChecklistsRepository from "../repositories/checklist.repository.js";
 import {
   Checklist,
@@ -11,19 +11,18 @@ import { UpdatedUserInfo } from "../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
 import { deleteFile } from "../middlewares/upload.js";
 import path from "path";
-import fs from "fs";
 
 export default class UserService {
   private userRepo: UserRepository;
   private checklistItemsRepo: ChecklistItemsRepository;
   private checklistsRepo: ChecklistsRepository;
-  private reviewsRepo: ReviewsRepository;
+  private reviewsRepo: itemReviewRepository;
 
   constructor() {
     (this.userRepo = new UserRepository()),
       (this.checklistItemsRepo = new ChecklistItemsRepository()),
       (this.checklistsRepo = new ChecklistsRepository()),
-      (this.reviewsRepo = new ReviewsRepository());
+      (this.reviewsRepo = new itemReviewRepository());
   }
 
   // 개인정보 조회
