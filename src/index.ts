@@ -1,7 +1,8 @@
 import express, { Express } from "express";
+import recommendationRouter from "./recommendations/recommendation.router.js";
+import errorHandlingMiddleware from "./middlewares/error-handling.js";
 import cors from "cors";
 import myRouter from "./my/my.router.js";
-import errorHandlingMiddleware from "./middlewares/error-handling.js";
 
 const app: Express = express();
 const PORT: 4000 = 4000;
@@ -13,6 +14,8 @@ app.use(cors());
 
 app.use("/my", myRouter);
 app.use("/uploads", express.static("uploads"));
+app.use("/recommendations", recommendationRouter);
+
 app.use(errorHandlingMiddleware);
 
 app.listen(PORT, () => {
