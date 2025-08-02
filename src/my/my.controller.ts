@@ -131,7 +131,9 @@ class UserController {
       packingBagChangedItems: req.body.packingBagChangedItems ?? [],
     };
     await this.userService.updateChecklist(checklistId, change);
-    return res.sendStatus(204);
+    return res.sendStatus(200).send({
+      message: "수정 완료",
+    });
   };
 
   // 체크리스트 삭제
