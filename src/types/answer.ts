@@ -1,7 +1,7 @@
 import { TravelType } from "@prisma/client";
 
 export type Answer = {
-  travel_type: TravelType;
+  travelType: TravelType;
   transportation: "rentalCar" | "publicTransportation";
   withPet: boolean;
   withBaby: boolean;

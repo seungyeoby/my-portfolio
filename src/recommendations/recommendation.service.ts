@@ -49,10 +49,6 @@ export default class RecommendationService {
         options.push(key);
       }
     });
-    console.log(
-      "🚀 ~ RecommendationService ~ getRecommendedItemIds ~ options:",
-      options
-    );
 
     const recommendedItems = await this.itemConditionRepo.getRecommendedItemIds(
       options
