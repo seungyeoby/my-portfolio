@@ -1,4 +1,4 @@
-import { UserRepository } from "../../repositories/user.repository.js";
+import UserRepository from "../../repositories/user.repository.js";
 import ChecklistItemsRepository from "../../repositories/checklistItems.repository.js";
 import itemReviewRepository from "../../repositories/itemReview.repository.js";
 import ChecklistsRepository from "../../repositories/checklist.repository.js";
@@ -7,7 +7,7 @@ import {
   ChangedChecklistItems,
   ChecklistDTO,
 } from "../../types/checklist.js";
-import { UpdatedUserInfo } from "../../types/publicUserInfo.js";
+import { UpdatedUserInfo } from "../../types/user.js";
 import { PackingBag } from "@prisma/client";
 import { deleteFile } from "../../middlewares/upload.js";
 import path from "path";

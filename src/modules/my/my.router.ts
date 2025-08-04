@@ -7,6 +7,7 @@ import {
   reviewValidator,
   handleValidationResult,
 } from "../../middlewares/validation.js";
+import { asyncHandler } from "../../middlewares/errorHandler.js";
 
 const router: Router = Router();
 
@@ -14,7 +15,7 @@ const router: Router = Router();
 router.get(
   "/",
   authenticateToken,
-  userController.getPersonalInfo
+  asyncHandler(userController.getPersonalInfo)
 );
 
 // 개인정보 수정
@@ -22,14 +23,14 @@ router.patch(
   "/",
   authenticateToken,
   uploadProfilePhoto,
-  userController.updatePersonalInfo
+  asyncHandler(userController.updatePersonalInfo)
 );
 
 // 전체 준비물 리뷰 조회
 router.get(
   "/items-reviews",
   authenticateToken,
-  userController.getAllReviews
+  asyncHandler(userController.getAllReviews)
 );
 
 // 개별 준비물 리뷰 조회
@@ -38,14 +39,14 @@ router.get(
   authenticateToken,
   reviewValidator,
   handleValidationResult,
-  userController.getReviewByReviewId
+  asyncHandler(userController.getReviewByReviewId)
 );
 
 // 내가 공유한 체크리스트 전체 조회
 router.get(
   "/shared-checklists",
   authenticateToken,
-  userController.getSharedChecklists
+  asyncHandler(userController.getSharedChecklists)
 );
 
 // 내가 공유한 개별 체크리스트 조회
@@ -54,14 +55,14 @@ router.get(
   authenticateToken,
   checklistValidator,
   handleValidationResult,
-  userController.getSharedChecklist
+  asyncHandler(userController.getSharedChecklist)
 );
 
 // 전체 체크리스트 조회
 router.get(
   "/checklists",
   authenticateToken,
-  userController.getChecklistsByUserId
+  asyncHandler(userController.getChecklistsByUserId)
 );
 
 // 개별 체크리스트 조회
@@ -70,13 +71,14 @@ router.get(
   authenticateToken,
   checklistValidator,
   handleValidationResult,
-  userController.getChecklistByChecklistId
+  asyncHandler(userController.getChecklistByChecklistId)
 );
 
 // 체크리스트 생성
 router.post(
-  "/checklists", authenticateToken,
-  userController.createChecklist
+  "/checklists",
+  authenticateToken,
+  asyncHandler(userController.createChecklist)
 );
 
 // 체크리스트 수정
@@ -85,7 +87,7 @@ router.patch(
   authenticateToken,
   checklistValidator,
   handleValidationResult,
-  userController.updateChecklist
+  asyncHandler(userController.updateChecklist)
 );
 
 // 체크리스트 삭제
@@ -94,7 +96,7 @@ router.delete(
   authenticateToken,
   checklistValidator,
   handleValidationResult,
-  userController.deleteChecklist
+  asyncHandler(userController.deleteChecklist)
 );
 
 export default router;
