@@ -1,15 +1,15 @@
-import UserRepository from "../repositories/user.repository.js";
-import ChecklistItemsRepository from "../repositories/checklistItems.repository.js";
-import itemReviewRepository from "../repositories/itemReview.repository.js";
-import ChecklistsRepository from "../repositories/checklist.repository.js";
+import { UserRepository } from "../../repositories/user.repository.js";
+import ChecklistItemsRepository from "../../repositories/checklistItems.repository.js";
+import itemReviewRepository from "../../repositories/itemReview.repository.js";
+import ChecklistsRepository from "../../repositories/checklist.repository.js";
 import {
   Checklist,
   ChangedChecklistItems,
   ChecklistDTO,
-} from "../types/checklist.js";
-import { UpdatedUserInfo } from "../types/publicUserInfo.js";
+} from "../../types/checklist.js";
+import { UpdatedUserInfo } from "../../types/publicUserInfo.js";
 import { PackingBag } from "@prisma/client";
-import { deleteFile } from "../middlewares/upload.js";
+import { deleteFile } from "../../middlewares/upload.js";
 import path from "path";
 
 export default class UserService {
@@ -145,12 +145,15 @@ export default class UserService {
 
   async getSharedChecklist(userId: number, checklistId: number) {
     const checklist = await this.checklistsRepo.getSharedChecklistByChecklistId(
-      userId,
       checklistId
     );
 
     if (!checklist) {
       throw new Error("ChecklistNotFound");
+    }
+
+    if (userId !== checklist.userId) {
+      throw new Error("Forbidden");
     }
 
     return checklist;

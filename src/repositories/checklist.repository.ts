@@ -120,40 +120,75 @@ export default class ChecklistsRepository {
       throw new Error("DatabaseError");
     }
   }
-
-  async getSharedChecklistByChecklistId(userId: number, checklistId: number) {
-    try {
-      return await prisma.checklist.findFirst({
-        select: {
-          checklistId: true,
-          title: true,
-          cityId: true,
-          travelType: true,
-          travelStart: true,
-          travelEnd: true,
-          createdAt: true,
-          content: true,
-          likes: true,
-          checklistItems: {
-            select: {
-              item: {
-                select: {
-                  itemLabel: true,
-                },
-              },
-              packingBag: true,
-            },
+  
+  async getSharedChecklistByChecklistId(checklistId: number) {
+    return prisma.checklist.findUnique({
+      where: {
+        checklistId,
+        isShared: true,
+        deletedAt: null,
+      },
+      include: {
+        user: { select: { nickname: true, profilePhoto: true } },
+        cities: true,
+        checklistItems: {
+          include: {
+            item: { include: { itemCategory: true } },
           },
         },
-        where: {
-          userId,
-          isShared: true,
-          checklistId,
-          deletedAt: null,
-        },
-      });
-    } catch (e) {
-      throw new Error("DatabaseError");
-    }
+      },
+    });
   }
+  
+  async shareChecklist(checklistId: number) {
+    return prisma.checklist.update({
+      where: { checklistId },
+      data: { isShared: true },
+    });
+  }
+
+  async unshareChecklist(checklistId: number) {
+    return prisma.checklist.update({
+      where: { checklistId },
+      data: { isShared: false },
+    });
+  }
+      async findChecklistByChecklistId(checklistId: number) {
+    return prisma.checklist.findUnique({
+      where: { checklistId },
+    });
+  }
+
+  async getSharedChecklistById(checklistId: number) {
+    return prisma.checklist.findUnique({
+      where: {
+        checklistId,
+        isShared: true,
+        deletedAt: null,
+      },
+      include: {
+        user: { select: { nickname: true, profilePhoto: true } },
+        cities: true,
+        checklistItems: {
+          include: {
+            item: { include: { itemCategory: true } },
+          },
+        },
+      },
+    });
+  }
+    async getAllSharedChecklists(sort: string) {
+    return prisma.checklist.findMany({
+      where: {
+        isShared: true,
+        deletedAt: null,
+      },
+      orderBy: sort === 'recent' ? { createdAt: 'desc' } : { likes: 'desc' },
+      include: {
+        user: { select: { nickname: true, profilePhoto: true } },
+        cities: true,
+      },
+    });
+  }
+
 }

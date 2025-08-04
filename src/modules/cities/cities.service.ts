@@ -1,4 +1,4 @@
-import CitiesRepository from "../repositories/cities.repository.js";
+import CitiesRepository from "../../repositories/cities.repository.js";
 
 export default class CitiesService {
   private citiesRepo: CitiesRepository;

@@ -1,5 +1,5 @@
 import RecommendationService from "./recommendation.service.js";
-import { Answer, RecommendedItems } from "../types/answer.js";
+import { Answer, RecommendedItems } from "../../types/answer.js";
 import { Request, Response } from "express";
 
 class RecommendationController {

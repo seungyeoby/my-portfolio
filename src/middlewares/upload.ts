@@ -5,6 +5,7 @@ import fs from "fs";
 // 업로드 디렉토리 생성
 const uploadDir = "uploads";
 const profileDir = path.join(uploadDir, "profiles");
+const itemImageDir = path.join(uploadDir, "item-images");
 
 // 디렉토리가 없으면 생성
 if (!fs.existsSync(uploadDir)) {
@@ -12,6 +13,10 @@ if (!fs.existsSync(uploadDir)) {
 }
 if (!fs.existsSync(profileDir)) {
   fs.mkdirSync(profileDir, { recursive: true });
+}
+
+if (!fs.existsSync(itemImageDir)) {
+  fs.mkdirSync(itemImageDir, { recursive: true });
 }
 
 // 파일 저장 설정
@@ -77,3 +82,10 @@ export const getProfilePhotoPath = (filename: string) => {
 export const getDefaultProfilePhoto = () => {
   return "/images/default-profile.svg";
 };
+
+// 아이템 이미지 업로드 설정
+export const uploadItemImage = multer({
+  storage: storage(itemImageDir, "item"),
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("image");

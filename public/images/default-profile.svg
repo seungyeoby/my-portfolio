@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 원 -->
+  <circle cx="100" cy="100" r="100" fill="#e0e0e0"/>
+  
+  <!-- 사용자 아이콘 -->
+  <g transform="translate(100, 100)">
+    <!-- 머리 -->
+    <circle cx="0" cy="-30" r="25" fill="#9e9e9e"/>
+    
+    <!-- 몸통 -->
+    <ellipse cx="0" cy="20" rx="35" ry="45" fill="#9e9e9e"/>
+    
+    <!-- 눈 -->
+    <circle cx="-8" cy="-35" r="3" fill="#ffffff"/>
+    <circle cx="8" cy="-35" r="3" fill="#ffffff"/>
+    
+    <!-- 입 -->
+    <path d="M -10 -20 Q 0 -15 10 -20" stroke="#ffffff" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- 텍스트 -->
+  <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+    Profile
+  </text>
+</svg> 
