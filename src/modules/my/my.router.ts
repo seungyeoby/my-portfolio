@@ -1,26 +1,26 @@
 import { Router } from "express";
-import { uploadProfilePhoto } from "../middlewares/upload.js";
+import { uploadProfilePhoto } from "../../middlewares/upload.js";
 import userController from "./my.controller.js";
-import { authenticateToken } from "../middlewares/auth.js";
+import { authenticateToken } from "../../middlewares/auth.js";
 import {
   checklistValidator,
   reviewValidator,
   handleValidationResult,
-} from "../middlewares/validation.js";
+} from "../../middlewares/validation.js";
 
 const router: Router = Router();
 
 // 개인정보 조회
 router.get(
   "/",
-  //authenticateToken,
+  authenticateToken,
   userController.getPersonalInfo
 );
 
 // 개인정보 수정
 router.patch(
   "/",
-  //authenticateToken,
+  authenticateToken,
   uploadProfilePhoto,
   userController.updatePersonalInfo
 );
@@ -28,14 +28,14 @@ router.patch(
 // 전체 준비물 리뷰 조회
 router.get(
   "/items-reviews",
-  //authenticateToken,
+  authenticateToken,
   userController.getAllReviews
 );
 
 // 개별 준비물 리뷰 조회
 router.get(
   "/items-reviews/:reviewId",
-  //authenticateToken,
+  authenticateToken,
   reviewValidator,
   handleValidationResult,
   userController.getReviewByReviewId
@@ -44,14 +44,14 @@ router.get(
 // 내가 공유한 체크리스트 전체 조회
 router.get(
   "/shared-checklists",
-  //authenticateToken,
+  authenticateToken,
   userController.getSharedChecklists
 );
 
 // 내가 공유한 개별 체크리스트 조회
 router.get(
   "/shared-checklists/:checklistId",
-  //authenticateToken,
+  authenticateToken,
   checklistValidator,
   handleValidationResult,
   userController.getSharedChecklist
@@ -60,14 +60,14 @@ router.get(
 // 전체 체크리스트 조회
 router.get(
   "/checklists",
-  //authenticateToken,
+  authenticateToken,
   userController.getChecklistsByUserId
 );
 
 // 개별 체크리스트 조회
 router.get(
   "/checklists/:checklistId",
-  //authenticateToken,
+  authenticateToken,
   checklistValidator,
   handleValidationResult,
   userController.getChecklistByChecklistId
@@ -75,14 +75,14 @@ router.get(
 
 // 체크리스트 생성
 router.post(
-  "/checklists", //authenticateToken,
+  "/checklists", authenticateToken,
   userController.createChecklist
 );
 
 // 체크리스트 수정
 router.patch(
   "/checklists/:checklistId",
-  //authenticateToken,
+  authenticateToken,
   checklistValidator,
   handleValidationResult,
   userController.updateChecklist
@@ -91,7 +91,7 @@ router.patch(
 // 체크리스트 삭제
 router.delete(
   "/checklists/:checklistId",
-  //authenticateToken,
+  authenticateToken,
   checklistValidator,
   handleValidationResult,
   userController.deleteChecklist

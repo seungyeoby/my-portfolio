@@ -3,8 +3,8 @@ import { AuthService } from "./auth.service.js";
 import { 
   ApiResponse, 
   User
-} from "../types/index.js";
-import { asyncHandler } from "../middlewares/errorHandler.js";
+} from "../../types/index.js";
+import { asyncHandler } from "../../middlewares/errorHandler.js";
 
 export class AuthController {
   private authService: AuthService;

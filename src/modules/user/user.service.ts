@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import { UserRepository } from "../repositories/user.repository.js";
-import { RefreshTokenService } from "../services/refreshTokenService.js";
+import { UserRepository } from "../../repositories/user.repository.js";
+import { RefreshTokenService } from "../../services/refreshTokenService.js";
 
 export class UserService {
   private userRepository: UserRepository;

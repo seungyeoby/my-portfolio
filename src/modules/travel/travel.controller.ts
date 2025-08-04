@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { TravelService } from "./travel.service.js";
-import { asyncHandler } from "../middlewares/errorHandler.js";
+import { asyncHandler } from "../../middlewares/errorHandler.js";
 
 export class TravelController {
   private travelService: TravelService;

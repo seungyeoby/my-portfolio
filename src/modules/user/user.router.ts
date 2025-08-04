@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-import { authenticateToken } from "../middlewares/auth.js";
-import { changePasswordValidation, validateCurrentPassword } from "../middlewares/validation.js";
+import { authenticateToken } from "../../middlewares/auth.js";
+import { changePasswordValidation, validateCurrentPassword } from "../../middlewares/validation.js";
 
 const router = express.Router();
 

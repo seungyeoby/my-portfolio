@@ -1,4 +1,4 @@
-import { TravelRepository } from "../repositories/travel.repository.js";
+import { TravelRepository } from "../../repositories/travel.repository.js";
 
 export class TravelService {
   private travelRepository: TravelRepository;

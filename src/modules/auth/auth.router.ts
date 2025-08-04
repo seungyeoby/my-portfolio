@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { uploadProfilePhoto } from "../middlewares/upload.js";
+import { uploadProfilePhoto } from "../../middlewares/upload.js";
 import { 
   signupValidation, 
   signinValidation, 
@@ -7,7 +7,7 @@ import {
   resetPasswordValidation,
   validateEmailNotExists,
   validateNicknameNotExists
-} from "../middlewares/validation.js";
+} from "../../middlewares/validation.js";
 
 const router = express.Router();
 

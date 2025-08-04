@@ -1,6 +1,6 @@
-import ItemsRepository from "../repositories/items.repository.js";
-import ItemCategoryRepository from "../repositories/itemCategory.repository.js";
-import { Item, Items } from "../types/Items.js";
+import ItemsRepository from "../../repositories/items.repository.js";
+import ItemCategoryRepository from "../../repositories/itemCategory.repository.js";
+import { Item, Items } from "../../types/Items.js";
 
 export default class ItemService {
   private itemRepo: ItemsRepository;

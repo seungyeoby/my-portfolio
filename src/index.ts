@@ -4,13 +4,16 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import authRoutes from "./auth/auth.router.js";
-import userRoutes from "./user/user.router.js";
-import travelRoutes from "./travel/travel.router.js";
-import recommendationRouter from "./recommendations/recommendation.router.js";
-import myRouter from "./my/my.router.js";
-import itemRouter from "./items/items.router.js";
-import citiesRouter from "./cities/cities.router.js";
+import authRoutes from "./modules/auth/auth.router.js";
+import userRoutes from "./modules/user/user.router.js";
+import travelRoutes from "./modules/travel/travel.router.js";
+import recommendationRouter from "./modules/recommendations/recommendation.router.js";
+import myRouter from "./modules/my/my.router.js";
+import itemRouter from "./modules/items/items.router.js";
+import citiesRouter from "./modules/cities/cities.router.js";
+import itemReviewRouter from './modules/itemReview/itemReview.router.js';
+import favoriteItemReviewRouter from './modules/favoriteItemReview/favoriteItemReview.router.js';
+import sharedChecklistRouter from './modules/sharedChecklist/sharedChecklist.router.js';
 import { TokenCleanupScheduler } from "./utils/tokenCleanup.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 
@@ -47,6 +50,9 @@ app.use("/my", myRouter);
 app.use("/recommendations", recommendationRouter);
 app.use("/items", itemRouter);
 app.use("/cities", citiesRouter);
+app.use('/item-reviews', itemReviewRouter);
+app.use('/favorite-item-reviews', favoriteItemReviewRouter);
+app.use('/shared-checklists', sharedChecklistRouter);
 
 // 기본 라우트
 app.get("/", (req, res) => {
