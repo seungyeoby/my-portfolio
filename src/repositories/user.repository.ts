@@ -60,12 +60,12 @@ export default class UserRepository {
   //   });
   // }
 
-  // 닉네임으로 사용자 찾기
-  async findByNickname(nickname: string) {
-    return await prisma.user.findUnique({
-      where: { nickname },
-    });
-  }
+  // // 닉네임으로 사용자 찾기
+  // async findByNickname(nickname: string) {
+  //   return await prisma.user.findUnique({
+  //     where: { nickname },
+  //   });
+  // }
 
   // // 닉네임과 생년월일로 사용자 찾기
   // async findByNicknameAndBirth(nickname: string, birthDate: Date) {
