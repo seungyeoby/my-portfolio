@@ -83,9 +83,21 @@ export const getDefaultProfilePhoto = () => {
   return "/images/default-profile.svg";
 };
 
+// 아이템 이미지용 storage 설정
+const itemImageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, itemImageDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `item_${uniqueSuffix}${ext}`);
+  },
+});
+
 // 아이템 이미지 업로드 설정
 export const uploadItemImage = multer({
-  storage: storage(itemImageDir, "item"),
+  storage: itemImageStorage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
 }).single("image");

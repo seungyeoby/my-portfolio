@@ -87,7 +87,20 @@ model User{
   checklists Checklist[]
   itemReviews ItemReview[]
   favoriteItemReviews UserFavoriteItemReview[]
+  refresh_tokens refresh_tokens[]
   @@map("users")
+}
+
+model refresh_tokens {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+  is_revoked Boolean  @default(false)
+  users      User     @relation(fields: [user_id], references: [userId], onDelete: Cascade)
+
+  @@index([user_id], map: "refresh_tokens_user_id_fkey")
 }
 enum Gender {
   MALE

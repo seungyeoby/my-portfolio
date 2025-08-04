@@ -82,8 +82,8 @@ export class AuthService {
       { expiresIn: "7d" }
     );
 
-    // 보안 강화된 RefreshToken 생성
-    const refreshToken = await this.refreshTokenService.createRefreshToken(Number(user.userId));
+    // 임시로 더미 RefreshToken 생성 (데이터베이스 스키마 문제 해결 후 제거)
+    const refreshToken = "dummy-refresh-token-" + Date.now();
 
     return {
       accessToken,

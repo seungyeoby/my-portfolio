@@ -18,11 +18,11 @@ export class AuthController {
     console.log("회원가입 요청 받음:", req.body);
     console.log("업로드된 파일:", req.file);
     
-    const { nickname, email, password, birth, gender } = req.body;
-    console.log("파싱된 데이터:", { nickname, email, birth, gender });
+    const { nickname, email, password, birthDate, gender } = req.body;
+    console.log("파싱된 데이터:", { nickname, email, birthDate, gender });
 
     const newUser = await this.authService.signup(
-      { nickname, email, password, birth, gender },
+      { nickname, email, password, birth: birthDate, gender },
       req.file
     );
 
