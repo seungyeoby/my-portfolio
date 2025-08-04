@@ -1,4 +1,4 @@
-import UserRepository from "../../repositories/user.repository.js";
+import { UserRepository } from "../../repositories/user.repository.js";
 import ChecklistItemsRepository from "../../repositories/checklistItems.repository.js";
 import itemReviewRepository from "../../repositories/itemReview.repository.js";
 import ChecklistsRepository from "../../repositories/checklist.repository.js";
@@ -145,12 +145,15 @@ export default class UserService {
 
   async getSharedChecklist(userId: number, checklistId: number) {
     const checklist = await this.checklistsRepo.getSharedChecklistByChecklistId(
-      userId,
       checklistId
     );
 
     if (!checklist) {
       throw new Error("ChecklistNotFound");
+    }
+
+    if (userId !== checklist.userId) {
+      throw new Error("Forbidden");
     }
 
     return checklist;

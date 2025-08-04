@@ -41,7 +41,6 @@ class UserController {
 
   // 전체 준비물 리뷰 조회
   getAllReviews = async (req: Request, res: Response) => {
-    
     const userId: number = req.user!.userId;
     const reviews = await this.userService.getAllReviews(userId);
     return res.status(200).send({
