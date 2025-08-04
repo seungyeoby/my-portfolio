@@ -9,6 +9,11 @@ export default class ItemConditionRepository {
             select: {
               itemId: true,
               itemLabel: true,
+              itemCategory: {
+                select: {
+                  categoryLabel: true,
+                },
+              },
             },
           },
         },
