@@ -58,7 +58,11 @@ export default class RecommendationService {
       new Map(
         recommendedItems.map(({ item }) => [
           item.itemId,
-          { itemId: item.itemId, itemLabel: item.itemLabel },
+          {
+            itemId: item.itemId,
+            categoryLabel: item.itemCategory.categoryLabel,
+            itemLabel: item.itemLabel,
+          },
         ])
       ).values()
     );
