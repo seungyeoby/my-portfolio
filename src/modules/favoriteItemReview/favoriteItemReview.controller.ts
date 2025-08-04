@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { FavoriteItemReviewService } from './favoriteItemReview.service.js';
 
+
 class FavoriteItemReviewController {
   private service = new FavoriteItemReviewService();
 
@@ -9,8 +10,8 @@ addFavorite = async (req: Request, res: Response, next: NextFunction) => {
   const { reviewId } = req.body;
 
   try {
-    await this.service.addFavorite(userId, reviewId);
-    return res.status(201).json({ message: '찜 완료' });
+    const result = await this.service.addFavorite(userId, reviewId);
+    return res.status(201).json(result);
   } catch (error: any) {
     if (error.message === 'AlreadyFavorite') {
       return res.status(400).json({ message: '이미 찜한 항목입니다.' });
@@ -20,17 +21,20 @@ addFavorite = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-  removeFavorite = async (req: Request, res: Response, next: NextFunction) => {
+removeFavorite = async (req: Request, res: Response, next: NextFunction) => {
   const userId: number = req.user!.userId;
-    const reviewId = Number(req.params.reviewId);
+  const reviewId = Number(req.params.reviewId);
 
-    try {
-      await this.service.removeFavorite(userId, reviewId);
-      return res.status(200).json({ message: '찜 취소' });
-    } catch (error) {
-       next(new Error("DeleteFavoriteItemReviewError"));
+  try {
+    const result = await this.service.removeFavorite(userId, reviewId);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    if (error.message === 'NotFavorite') {
+      return res.status(400).json({ message: '찜하지 않은 항목입니다.' });
     }
-  };
+    next(new Error("DeleteFavoriteItemReviewError"));
+  }
+};
 
   getFavorites = async (req: Request, res: Response, next: NextFunction) => {
       const userId: number = req.user!.userId;

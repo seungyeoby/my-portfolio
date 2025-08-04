@@ -93,7 +93,7 @@ export default class itemReviewRepository {
     });
   }
 
-  async findById(reviewId: number) {
+  async findByReviewId(reviewId: number) {
     return prisma.itemReview.findUnique({
       where: { reviewId },
       include: {
@@ -137,17 +137,4 @@ export default class itemReviewRepository {
     });
   }
 
-  async increaseLikes(reviewId: number) {
-    return prisma.itemReview.update({
-      where: { reviewId },
-      data: { likes: { increment: 1 } }
-    });
-  }
-
-  async decreaseLikes(reviewId: number) {
-    return prisma.itemReview.update({
-      where: { reviewId },
-      data: { likes: { decrement: 1 } }
-    });
-  }
 }

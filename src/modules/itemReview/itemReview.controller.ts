@@ -47,17 +47,6 @@ getAllItemReviews = async (req: Request, res: Response, next: NextFunction) => {
     }
   };
 
-  toggleFavoriteReview = async (req: Request, res: Response, next: NextFunction) => {
-    const userId: number = req.user!.userId;
-    const reviewId = Number(req.params.reviewId);
-    try {
-      const result = await this.service.toggleFavorite(userId, reviewId);
-      res.status(200).json(result);
-    } catch (error) {
-      next(new Error("likesError"));
-    }
-  };
-
   updateItemReview = async (req: Request, res: Response, next: NextFunction) => {
     const reviewId = Number(req.params.reviewId);
     const { title, content, image, checklistId, itemId } = req.body;

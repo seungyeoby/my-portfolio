@@ -22,28 +22,10 @@ export class ItemReviewService {
 
   async getItemReviewById(reviewId: number) {
     try {
-      const review = await this.repo.findById(reviewId);
+      const review = await this.repo.findByReviewId(reviewId);
       if (!review) throw new Error('ItemReviewNotFound');
       if (review.deletedAt) throw new Error('ItemReviewDeleted');
       return review;
-    } catch (error) {
-      throw new Error("DataBaseError");
-    }
-  }
-
-  async toggleFavorite(userId: number, reviewId: number) {
-    try {
-      const existing = await this.repo.findFavorite(userId, reviewId);
-
-      if (existing) {
-        await this.repo.removeFavorite(userId, reviewId);
-        await this.repo.decreaseLikes(reviewId);
-        return { liked: false, message: '좋아요 취소됨' };
-      } else {
-        await this.repo.addFavorite(userId, reviewId);
-        await this.repo.increaseLikes(reviewId);
-        return { liked: true, message: '좋아요 추가됨' };
-      }
     } catch (error) {
       throw new Error("DataBaseError");
     }
@@ -55,7 +37,7 @@ export class ItemReviewService {
     user: { userId: number; authority: string }
   ) {
     try {
-      const review = await this.repo.findById(reviewId);
+      const review = await this.repo.findByReviewId(reviewId);
       if (!review) throw new Error("ItemReviewNotFound");
 
       const isOwner = review.userId === user.userId;
@@ -71,7 +53,7 @@ export class ItemReviewService {
 
   async deleteItemReview(reviewId: number, user: { userId: number; authority: string }) {
     try {
-      const review = await this.repo.findById(reviewId);
+      const review = await this.repo.findByReviewId(reviewId);
       if (!review || review.deletedAt) throw new Error("ItemReviewNotFound");
 
       const isOwner = review.userId === user.userId;
