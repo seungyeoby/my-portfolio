@@ -1,4 +1,6 @@
 import prisma from "../lib/prisma.js";
+import { Prisma } from "@prisma/client";
+import { CreateItemReviewInput, UpdateItemReviewInput, ReviewQuery } from "../types/itemReview.js";
 
 export default class itemReviewRepository {
   async getAllReviewsByUserId(userId: number) {
