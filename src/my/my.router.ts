@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { uploadProfilePhoto } from "../middlewares/upload.js";
 import userController from "./my.controller.js";
-import { authenticateToken } from "../middlewares/authenticate.js";
+import { authenticateToken } from "../middlewares/auth.js";
 import {
   checklistValidator,
   reviewValidator,
