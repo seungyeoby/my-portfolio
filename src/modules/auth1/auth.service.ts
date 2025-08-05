@@ -42,21 +42,30 @@ export default class AuthService {
     await this.userRepo.createUser(signUpUserInfo);
   }
 
-  async signIn(userInfo: SignInInfo) {
-    const user = await this.userRepo.findByEmail(userInfo.email);
+ async signIn(userInfo: SignInInfo) {
+  const user = await this.userRepo.findByEmail(userInfo.email);
+  if (!user) {
+    console.log("❌ 사용자 없음:", userInfo.email);
+    throw new Error("UserNotFound");
+  }
 
-    if (!user) {
-      throw new Error("UserNotFound");
-    }
+  console.log("✅ 사용자 존재:", user.email);
+  console.log("입력한 비밀번호:", userInfo.password);
+  console.log("DB 저장된 해시:", user.password);
 
-    const isPasswordVerified = await bcrypt.compare(
-      userInfo.password,
-      user.password
-    );
+  const isPasswordVerified = await bcrypt.compare(
+    userInfo.password,
+    user.password
+  );
 
-    if (!isPasswordVerified) {
-      throw new Error("PasswordError");
-    }
+  if (!isPasswordVerified) {
+    console.log("❌ 비밀번호 불일치");
+    throw new Error("PasswordError");
+  }
+
+  console.log("✅ 로그인 성공");
+
+
 
     const publicUserInfo: PublicUserInfo = {
       email: user.email,
@@ -78,51 +87,5 @@ export default class AuthService {
     );
 
     return { publicUserInfo, token };
-  }
-
-  // 로그아웃 (현재는 단순히 성공 응답만 반환)
-  async signOut() {
-    // 실제 구현에서는 토큰 블랙리스트나 세션 관리가 필요할 수 있음
-    return { message: "로그아웃이 완료되었습니다" };
-  }
-
-  // 이메일 찾기
-  async findId(nickname: string, birthDate: string): Promise<string> {
-    const user = await this.userRepo.findByNicknameAndBirth(
-      nickname,
-      new Date(birthDate)
-    );
-
-    if (!user) {
-      throw new Error("UserInfoNotFound");
-    }
-
-    return user.email;
-  }
-
-  // 비밀번호 재설정
-  async resetPassword(
-    email: string,
-    nickname: string,
-    birthDate: string,
-    newPassword: string
-  ): Promise<void> {
-    const user = await this.userRepo.findByEmailNicknameAndBirth(
-      email,
-      nickname,
-      new Date(birthDate)
-    );
-
-    if (!user) {
-      throw new Error("UserInfoNotFound");
-    }
-
-    // 새 비밀번호 해시화
-    const saltRound = 10;
-    const salt = await bcrypt.genSalt(saltRound);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // 비밀번호 업데이트
-    await this.userRepo.updatePassword(Number(user.userId), hashedPassword);
   }
 }
