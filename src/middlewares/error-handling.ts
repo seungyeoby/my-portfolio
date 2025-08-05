@@ -69,6 +69,8 @@ export default function (
       return res.status(409).json({ message: "이미 사용 중인 이메일입니다." });
     case "NicknameAlreadyExists":
       return res.status(409).json({ message: "이미 사용 중인 닉네임입니다." });
+    case "UserInfoNotFound":
+      return res.status(404).json({ message: "일치하는 정보를 찾을 수 없습니다" });
     default:
       return res.status(500).json({ message: "서버 오류" });
   }

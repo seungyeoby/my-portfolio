@@ -79,4 +79,50 @@ export default class AuthService {
 
     return { publicUserInfo, token };
   }
+
+  // 로그아웃 (현재는 단순히 성공 응답만 반환)
+  async signOut() {
+    // 실제 구현에서는 토큰 블랙리스트나 세션 관리가 필요할 수 있음
+    return { message: "로그아웃이 완료되었습니다" };
+  }
+
+  // 이메일 찾기
+  async findId(nickname: string, birthDate: string): Promise<string> {
+    const user = await this.userRepo.findByNicknameAndBirth(
+      nickname,
+      new Date(birthDate)
+    );
+
+    if (!user) {
+      throw new Error("UserInfoNotFound");
+    }
+
+    return user.email;
+  }
+
+  // 비밀번호 재설정
+  async resetPassword(
+    email: string,
+    nickname: string,
+    birthDate: string,
+    newPassword: string
+  ): Promise<void> {
+    const user = await this.userRepo.findByEmailNicknameAndBirth(
+      email,
+      nickname,
+      new Date(birthDate)
+    );
+
+    if (!user) {
+      throw new Error("UserInfoNotFound");
+    }
+
+    // 새 비밀번호 해시화
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // 비밀번호 업데이트
+    await this.userRepo.updatePassword(Number(user.userId), hashedPassword);
+  }
 }
