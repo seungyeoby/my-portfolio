@@ -1,6 +1,6 @@
 import ItemsRepository from "../../repositories/items.repository.js";
 import ItemCategoryRepository from "../../repositories/itemCategory.repository.js";
-import { Item, Items } from "../../types/Items.js";
+import { Item, Items, ItemWithClickCount } from "../../types/Items.js";
 
 export default class ItemService {
   private itemRepo: ItemsRepository;
@@ -20,7 +20,8 @@ export default class ItemService {
   }
 
   async getItemsByClickCountDesc() {
-    const items: Item[] = await this.itemRepo.getItemsByClickCountDesc();
+    const items: ItemWithClickCount[] =
+      await this.itemRepo.getItemsByClickCountDesc();
     const res = items.map(({ itemLabel, clickCount }) => ({
       itemLabel,
       clickCount,

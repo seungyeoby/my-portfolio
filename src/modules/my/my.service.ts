@@ -171,6 +171,9 @@ export default class UserService {
         change.addedItems,
         checklistId
       );
+
+      const itemIds = change.addedItems.map(({ itemId, packingBag }) => itemId);
+      await this.itemRepo.upClickCount(itemIds);
     }
 
     if (change.removedItems.length) {
