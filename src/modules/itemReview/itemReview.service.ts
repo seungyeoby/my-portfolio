@@ -68,7 +68,5 @@ export class ItemReviewService {
 
   async getTopLikedReviewSummary() {
   return await this.repo.getTopLikedReviewSummary();
-  }
-
-
+}
 }

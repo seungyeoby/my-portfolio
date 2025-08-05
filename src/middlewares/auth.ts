@@ -13,9 +13,7 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers["authorization"];
-  console.log(authHeader)
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+  const token = req.cookies.accessToken;
 
   if (!token) {
     return res.status(401).json({

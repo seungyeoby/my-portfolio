@@ -1,198 +1,91 @@
-// import bcrypt from "bcrypt";
-// import jwt from "jsonwebtoken";
-// import { RefreshTokenService } from "../../services/refreshTokenService.js";
-// import UserRepository from "../../repositories/user.repository.js";
-// import {
-//   uploadProfilePhoto,
-//   getProfilePhotoPath,
-//   getDefaultProfilePhoto,
-// } from "../../middlewares/upload.js";
-// import {
-//   User,
-//   LoginRequest,
-//   SignupRequest,
-//   JWTPayload,
-// } from "../../types/index.js";
+import UserRepository from "../../repositories/user.repository.js";
+import { SignUpInfo, SignInInfo, PublicUserInfo } from "../../types/user.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+config();
 
-// export class AuthService {
-//   private refreshTokenService: RefreshTokenService;
-//   private userRepository: UserRepository;
+export default class AuthService {
+  private userRepo: UserRepository;
 
-//   constructor() {
-//     this.refreshTokenService = new RefreshTokenService();
-//     this.userRepository = new UserRepository();
-//   }
+  constructor() {
+    this.userRepo = new UserRepository();
+  }
 
-//   // 회원가입
-//   async signup(
-//     signupData: SignupRequest,
-//     profilePhoto?: Express.Multer.File
-//   ): Promise<User> {
-//     // 프로필 사진 경로 설정
-//     let profilePhotoPath: string;
-//     if (profilePhoto) {
-//       const uploadedPath = getProfilePhotoPath(profilePhoto.filename);
-//       profilePhotoPath = uploadedPath || getDefaultProfilePhoto();
-//     } else {
-//       profilePhotoPath = getDefaultProfilePhoto();
-//     }
+  async signUp(userInfo: SignUpInfo) {
+    const existingUser = await this.userRepo.findByEmail(userInfo.email);
 
-//     // 비밀번호 해시화
-//     const saltRounds = 12;
-//     const hashedPassword = await bcrypt.hash(signupData.password, saltRounds);
+    if (existingUser) {
+      throw new Error("EmailAlreadyExists");
+    }
 
-//     // 사용자 생성
-//     const newUser = await this.userRepository.create({
-//       nickname: signupData.nickname,
-//       email: signupData.email,
-//       password: hashedPassword,
-//       birthDate: new Date(signupData.birth),
-//       gender: signupData.gender,
-//       profilePhoto: profilePhotoPath,
-//     });
+    const existingNickname = await this.userRepo.findByNickname(
+      userInfo.nickname
+    );
 
-//     return {
-//       userId: Number(newUser.userId),
-//       nickname: newUser.nickname,
-//       email: newUser.email,
-//       birthDate: newUser.birthDate,
-//       gender: newUser.gender || undefined,
-//       profilePhoto: newUser.profilePhoto || undefined,
-//       authority: newUser.authority,
-//     };
-//   }
+    if (existingNickname) {
+      throw new Error("NicknameAlreadyExists");
+    }
 
-//   // 로그인
-//   async signin(
-//     loginData: LoginRequest
-//   ): Promise<{ accessToken: string; user: User; refreshToken: string }> {
-//     // 사용자 찾기
-//     const user = await this.userRepository.findByEmail(loginData.email);
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const bcryptPassword = await bcrypt.hash(userInfo.password, salt);
 
-//     if (!user) {
-//       throw new Error("이메일 또는 비밀번호가 올바르지 않습니다");
-//     }
+    const birthDate = new Date(userInfo.birthDate);
 
-//     // 비밀번호 확인
-//     const isPasswordValid = await bcrypt.compare(
-//       loginData.password,
-//       user.password
-//     );
+    const signUpUserInfo = {
+      ...userInfo,
+      password: bcryptPassword,
+      birthDate,
+    };
 
-//     if (!isPasswordValid) {
-//       throw new Error("이메일 또는 비밀번호가 올바르지 않습니다");
-//     }
+    await this.userRepo.createUser(signUpUserInfo);
+  }
 
-//     // JWT 토큰 생성
-//     const accessToken = jwt.sign(
-//       {
-//         userId: Number(user.userId),
-//         email: user.email,
-//         authority: user.authority,
-//       } as JWTPayload,
-//       process.env.JWT_SECRET || "your-secret-key",
-//       { expiresIn: "7d" }
-//     );
+ async signIn(userInfo: SignInInfo) {
+  const user = await this.userRepo.findByEmail(userInfo.email);
+  if (!user) {
+    console.log("❌ 사용자 없음:", userInfo.email);
+    throw new Error("UserNotFound");
+  }
 
-//     // 임시로 더미 RefreshToken 생성 (데이터베이스 스키마 문제 해결 후 제거)
-//     const refreshToken = "dummy-refresh-token-" + Date.now();
+  console.log("✅ 사용자 존재:", user.email);
+  console.log("입력한 비밀번호:", userInfo.password);
+  console.log("DB 저장된 해시:", user.password);
 
-//     return {
-//       accessToken,
-//       refreshToken,
-//       user: {
-//         userId: Number(user.userId),
-//         nickname: user.nickname,
-//         email: user.email,
-//         birthDate: user.birthDate,
-//         gender: user.gender || undefined,
-//         profilePhoto: user.profilePhoto || undefined,
-//         authority: user.authority,
-//       },
-//     };
-//   }
+  const isPasswordVerified = await bcrypt.compare(
+    userInfo.password,
+    user.password
+  );
 
-//   // 로그아웃
-//   async signout(refreshToken: string): Promise<void> {
-//     await this.refreshTokenService.revokeRefreshToken(refreshToken);
-//   }
+  if (!isPasswordVerified) {
+    console.log("❌ 비밀번호 불일치");
+    throw new Error("PasswordError");
+  }
 
-//   // 이메일 찾기
-//   async findId(nickname: string, birth: string): Promise<string> {
-//     const user = await this.userRepository.findByNicknameAndBirth(
-//       nickname,
-//       new Date(birth)
-//     );
+  console.log("✅ 로그인 성공");
 
-//     if (!user) {
-//       throw new Error("일치하는 정보를 찾을 수 없습니다");
-//     }
 
-//     return user.email;
-//   }
 
-//   // 비밀번호 재설정
-//   async resetPassword(
-//     email: string,
-//     nickname: string,
-//     birth: string,
-//     newPassword: string
-//   ): Promise<void> {
-//     const user = await this.userRepository.findByEmailNicknameAndBirth(
-//       email,
-//       nickname,
-//       new Date(birth)
-//     );
+    const publicUserInfo: PublicUserInfo = {
+      email: user.email,
+      nickname: user.nickname,
+      birthDate: user.birthDate,
+      profilePhoto: user.profilePhoto || undefined,
+      gender: user.gender,
+      authority: user.authority,
+    };
 
-//     if (!user) {
-//       throw new Error("일치하는 정보를 찾을 수 없습니다");
-//     }
+    const token = jwt.sign(
+      {
+        userId: user.userId,
+      },
+      process.env.SECRET_KEY!,
+      {
+        expiresIn: "10h",
+      }
+    );
 
-//     // 새 비밀번호 해시화
-//     const saltRounds = 12;
-//     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-//     // 비밀번호 업데이트
-//     await this.userRepository.updatePassword(
-//       Number(user.userId),
-//       hashedPassword
-//     );
-//   }
-
-//   // Access Token 갱신
-//   async refresh(
-//     refreshToken: string
-//   ): Promise<{ accessToken: string; newRefreshToken: string }> {
-//     // Refresh Token Rotation (보안 강화)
-//     const rotationResult = await this.refreshTokenService.rotateRefreshToken(
-//       refreshToken
-//     );
-
-//     if (!rotationResult) {
-//       throw new Error("유효하지 않은 Refresh Token입니다");
-//     }
-
-//     // 사용자 정보 조회
-//     const user = await this.userRepository.findById(rotationResult.userId);
-
-//     if (!user) {
-//       throw new Error("유효하지 않은 Refresh Token입니다");
-//     }
-
-//     // 새로운 Access Token 생성
-//     const newAccessToken = jwt.sign(
-//       {
-//         userId: Number(user.userId),
-//         email: user.email,
-//         authority: user.authority,
-//       } as JWTPayload,
-//       process.env.JWT_SECRET || "your-secret-key",
-//       { expiresIn: "7d" }
-//     );
-
-//     return {
-//       accessToken: newAccessToken,
-//       newRefreshToken: rotationResult.newToken,
-//     };
-//   }
-// }
+    return { publicUserInfo, token };
+  }
+}

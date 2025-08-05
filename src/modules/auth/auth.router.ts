@@ -1,34 +1,49 @@
-// import express from "express";
-// import { uploadProfilePhoto } from "../../middlewares/upload.js";
-// import {
-//   signupValidation,
-//   signinValidation,
-//   findIdValidation,
-//   resetPasswordValidation,
-//   validateEmailNotExists,
-//   validateNicknameNotExists
-// } from "../../middlewares/validation.js";
-// import { AuthController } from "./auth.controller.js";
+import { Router } from "express";
+import { uploadProfilePhoto } from "../../middlewares/upload.js";
+import {
+  signupValidation,
+  signinValidation,
+  findIdValidation,
+  resetPasswordValidation,
+  handleValidationResult,
+} from "../../middlewares/validation.js";
+import authController from "./auth.controller.js";
+import { asyncHandler } from "../../middlewares/errorHandler.js";
 
-// const router = express.Router();
-// const authController = new AuthController();
+const router: Router = Router();
 
-// // 회원가입 API (파일 업로드 포함)
-// router.post("/sign-up", uploadProfilePhoto, signupValidation, validateEmailNotExists, validateNicknameNotExists, authController.signup);
+router.post(
+  "/sign-up",
+  signupValidation,
+  handleValidationResult,
+  uploadProfilePhoto,
+  asyncHandler(authController.signUp)
+);
 
-// // 로그인 API
-// router.post("/sign-in", signinValidation, authController.signin);
+router.post(
+  "/sign-in",
+  signinValidation,
+  handleValidationResult,
+  asyncHandler(authController.signIn)
+);
 
-// // 로그아웃 API
-// router.post("/sign-out", authController.signout);
+// 로그아웃
+router.post("/sign-out", asyncHandler(authController.signOut));
 
-// // 이메일 찾기 API
-// router.post("/find-id", findIdValidation, authController.findId);
+// 이메일 찾기
+router.post(
+  "/find-id",
+  findIdValidation,
+  handleValidationResult,
+  asyncHandler(authController.findId)
+);
 
-// // 비밀번호 재설정 API
-// router.post("/reset-password", resetPasswordValidation, authController.resetPassword);
+// 비밀번호 재설정
+router.post(
+  "/reset-password",
+  resetPasswordValidation,
+  handleValidationResult,
+  asyncHandler(authController.resetPassword)
+);
 
-// // Access Token 갱신 API (보안 강화)
-// router.post("/refresh", authController.refresh);
-
-// export default router;
+export default router;

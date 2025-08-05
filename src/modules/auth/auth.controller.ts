@@ -1,164 +1,105 @@
-// import { Request, Response } from "express";
-// import { AuthService } from "./auth.service.js";
-// import {
-//   ApiResponse,
-//   User
-// } from "../../types/index.js";
-// import { asyncHandler } from "../../middlewares/errorHandler.js";
+import AuthService from "./auth.service.js";
+import UserRepository from "../../repositories/user.repository.js";
+import { Request, Response } from "express";
+import { SignUpInfo, SignInInfo } from "../../types/user.js";
+import {
+  FindEmailRequest,
+  FindEmailResponse,
+  ResetPasswordRequest,
+  LogoutResponse,
+} from "../../types/index.js";
 
-// export class AuthController {
-//   private authService: AuthService;
+class AuthController {
+  private authService: AuthService;
+  private userRepo: UserRepository;
 
-//   constructor() {
-//     this.authService = new AuthService();
-//   }
+  constructor() {
+    this.authService = new AuthService();
+    this.userRepo = new UserRepository();
+  }
 
-//   // 회원가입
-//   signup = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("회원가입 요청 받음:", req.body);
-//     console.log("업로드된 파일:", req.file);
+  signUp = async (req: Request, res: Response) => {
+    const userInfo: SignUpInfo = req.body;
+    await this.authService.signUp(userInfo);
+    return res.status(201).json({
+      message: "회원가입 완료",
+    });
+  };
 
-//     const { nickname, email, password, birthDate, gender } = req.body;
-//     console.log("파싱된 데이터:", { nickname, email, birthDate, gender });
+  signIn = async (req: Request, res: Response) => {
+    const userInfo: SignInInfo = req.body;
+    const { publicUserInfo, token } = await this.authService.signIn(userInfo);
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 12,
+      path:"/"
+    });
+    return res.status(200).json({
+      data: { publicUserInfo },
+    });
+  };
 
-//     const newUser = await this.authService.signup(
-//       { nickname, email, password, birth: birthDate, gender },
-//       req.file
-//     );
+  // 로그아웃
+  signOut = async (req: Request, res: Response): Promise<void> => {
+    // 실제 구현에서는 토큰 블랙리스트나 세션 관리가 필요할 수 있음
+    const response: LogoutResponse = {
+      message: "로그아웃이 완료되었습니다",
+    };
+    res.status(200).json(response);
+  };
 
-//     console.log("사용자 생성 완료:", newUser.email);
+  // 이메일 찾기
+  findId = async (req: Request, res: Response): Promise<void> => {
+    const { nickname, birthDate }: FindEmailRequest = req.body;
 
-//     const response: ApiResponse<User> = {
-//       success: true,
-//       message: "회원가입이 완료되었습니다",
-//       data: newUser,
-//     };
+    // UserRepository를 직접 사용
+    const user = await this.userRepo.findByNicknameAndBirth(
+      nickname,
+      new Date(birthDate)
+    );
 
-//     res.status(201).json(response);
-//   });
+    if (!user) {
+      throw new Error("UserInfoNotFound");
+    }
 
-//   // 로그인
-//   signin = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("로그인 요청 받음:", req.body);
+    const response: FindEmailResponse = {
+      message: "이메일을 찾았습니다",
+      email: user.email,
+    };
+    res.status(200).json(response);
+  };
 
-//     const { email, password } = req.body;
-//     console.log("파싱된 데이터:", { email });
+  // 비밀번호 재설정
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    const { email, nickname, birthDate, newPassword }: ResetPasswordRequest =
+      req.body;
 
-//     const result = await this.authService.signin({ email, password });
+    // UserRepository를 직접 사용
+    const user = await this.userRepo.findByEmailNicknameAndBirth(
+      email,
+      nickname,
+      new Date(birthDate)
+    );
 
-//     // Refresh Token을 HttpOnly 쿠키로 설정
-//     res.cookie("refreshToken", result.refreshToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "strict",
-//       maxAge: 30 * 24 * 60 * 60 * 1000, // 30일
-//     });
+    if (!user) {
+      throw new Error("UserInfoNotFound");
+    }
 
-//     console.log("로그인 성공:", result.user.email);
+    // 새 비밀번호 해시화
+    const bcrypt = await import("bcrypt");
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-//     const response: ApiResponse<{ accessToken: string; user: User }> = {
-//       success: true,
-//       message: "로그인이 완료되었습니다",
-//       data: {
-//         accessToken: result.accessToken,
-//         user: result.user,
-//       },
-//     };
+    // 비밀번호 업데이트
+    await this.userRepo.updatePassword(Number(user.userId), hashedPassword);
 
-//     res.json(response);
-//   });
+    res.status(200).json({
+      message: "비밀번호가 성공적으로 재설정되었습니다",
+    });
+  };
+}
 
-//   // 로그아웃
-//   signout = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("로그아웃 요청 받음");
-
-//     const refreshToken = req.cookies.refreshToken;
-
-//     if (refreshToken) {
-//       await this.authService.signout(refreshToken);
-//     }
-
-//     // 쿠키 삭제
-//     res.clearCookie("refreshToken");
-
-//     console.log("로그아웃 완료");
-
-//     const response: ApiResponse = {
-//       success: true,
-//       message: "로그아웃이 완료되었습니다",
-//     };
-
-//     res.json(response);
-//   });
-
-//   // 이메일 찾기
-//   findId = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("이메일 찾기 요청 받음:", req.body);
-
-//     const { nickname, birth } = req.body;
-//     console.log("파싱된 데이터:", { nickname, birth });
-
-//     const email = await this.authService.findId(nickname, birth);
-
-//     console.log("이메일 찾기 성공:", email);
-
-//     const response: ApiResponse<{ email: string }> = {
-//       success: true,
-//       message: "이메일을 찾았습니다",
-//       data: { email },
-//     };
-
-//     res.json(response);
-//   });
-
-//   // 비밀번호 재설정
-//   resetPassword = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("비밀번호 재설정 요청 받음:", req.body);
-
-//     const { email, nickname, birth, newPassword } = req.body;
-//     console.log("파싱된 데이터:", { email, nickname, birth });
-
-//     await this.authService.resetPassword(email, nickname, birth, newPassword);
-
-//     console.log("비밀번호 재설정 성공:", email);
-
-//     const response: ApiResponse = {
-//       success: true,
-//       message: "비밀번호가 성공적으로 재설정되었습니다",
-//     };
-
-//     res.json(response);
-//   });
-
-//   // Access Token 갱신
-//   refresh = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-//     console.log("Access Token 갱신 요청 받음");
-
-//     // 쿠키에서 Refresh Token 추출
-//     const refreshToken = req.cookies.refreshToken;
-
-//     if (!refreshToken) {
-//       throw new Error("Refresh Token이 필요합니다");
-//     }
-
-//     const result = await this.authService.refresh(refreshToken);
-
-//     // 새로운 Refresh Token을 쿠키에 설정
-//     res.cookie("refreshToken", result.newRefreshToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "strict",
-//       maxAge: 30 * 24 * 60 * 60 * 1000, // 30일
-//     });
-
-//     console.log("Access Token 갱신 성공");
-
-//     const response: ApiResponse<{ accessToken: string }> = {
-//       success: true,
-//       message: "Access Token이 갱신되었습니다",
-//       data: { accessToken: result.accessToken },
-//     };
-
-//     res.json(response);
-//   });
-// }
+export default new AuthController();
