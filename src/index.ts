@@ -13,6 +13,7 @@ import sharedChecklistRouter from "./modules/sharedChecklist/sharedChecklist.rou
 import errorHandlingMiddleware from "./middlewares/error-handling.js";
 import authRouter from "./modules/auth/auth.router.js";
 import "express-async-errors";
+import cookieParser from "cookie-parser";
 
 // 환경 변수 로드
 dotenv.config();
@@ -25,6 +26,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 미들웨어 설정
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());

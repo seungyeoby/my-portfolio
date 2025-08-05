@@ -29,6 +29,12 @@ class AuthController {
   signIn = async (req: Request, res: Response) => {
     const userInfo: SignInInfo = req.body;
     const { publicUserInfo, token } = await this.authService.signIn(userInfo);
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 12,
+    });
     return res.status(200).json({
       data: { publicUserInfo, token },
     });
