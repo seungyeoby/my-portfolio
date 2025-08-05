@@ -5,7 +5,7 @@ import { authenticateToken } from "../../middlewares/auth.js";
 const router = express.Router();
 
 // 후기 찜 추가, 실시간 찜 증가
-router.post('/', authenticateToken, favoriteItemReviewController.addFavorite);
+router.post('/:reviewId', authenticateToken, favoriteItemReviewController.addFavorite);
 
 // 찜한 후기 전체 조회
 router.get('/', authenticateToken, favoriteItemReviewController.getFavorites);
