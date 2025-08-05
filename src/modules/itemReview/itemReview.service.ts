@@ -65,4 +65,8 @@ export class ItemReviewService {
       throw new Error("DataBaseError");
     }
   }
+
+  async getTopLikedReviewSummary() {
+  return await this.repo.getTopLikedReviewSummary();
+}
 }
