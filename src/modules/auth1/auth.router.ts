@@ -3,10 +3,6 @@ import { uploadProfilePhoto } from "../../middlewares/upload.js";
 import {
   signupValidation,
   signinValidation,
-  findIdValidation,
-  resetPasswordValidation,
-  // validateEmailNotExists,
-  // validateNicknameNotExists,
   handleValidationResult,
 } from "../../middlewares/validation.js";
 import authController from "./auth.controller.js";
@@ -18,6 +14,7 @@ router.post(
   "/sign-up",
   signupValidation,
   handleValidationResult,
+  uploadProfilePhoto,
   asyncHandler(authController.signUp)
 );
 
