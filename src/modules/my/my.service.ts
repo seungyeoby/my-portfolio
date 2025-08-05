@@ -2,6 +2,7 @@ import UserRepository from "../../repositories/user.repository.js";
 import ChecklistItemsRepository from "../../repositories/checklistItems.repository.js";
 import itemReviewRepository from "../../repositories/itemReview.repository.js";
 import ChecklistsRepository from "../../repositories/checklist.repository.js";
+import ItemsRepository from "../../repositories/items.repository.js";
 import {
   Checklist,
   ChangedChecklistItems,
@@ -17,12 +18,14 @@ export default class UserService {
   private checklistItemsRepo: ChecklistItemsRepository;
   private checklistsRepo: ChecklistsRepository;
   private reviewsRepo: itemReviewRepository;
+  private itemRepo: ItemsRepository;
 
   constructor() {
     (this.userRepo = new UserRepository()),
       (this.checklistItemsRepo = new ChecklistItemsRepository()),
       (this.checklistsRepo = new ChecklistsRepository()),
-      (this.reviewsRepo = new itemReviewRepository());
+      (this.reviewsRepo = new itemReviewRepository()),
+      (this.itemRepo = new ItemsRepository());
   }
 
   // 개인정보 조회
@@ -76,6 +79,8 @@ export default class UserService {
       travelEnd: new Date(checklistInfo.travelEnd),
     };
     await this.checklistsRepo.saveChecklist(items, parsedChecklistInfo);
+    const itemIds: number[] = items.map(({ itemId, packingBag }) => itemId);
+    await this.itemRepo.upClickCount(itemIds);
   }
 
   async deleteChecklist(checklistId: number) {
