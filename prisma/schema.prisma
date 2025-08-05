@@ -1,99 +1,104 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model ItemCondition{
-  itemConditionId Int @id @default(autoincrement()) @map("item_condition_id")
-  itemId Int @map("item_id")
-  conditionValue String @map("condition_value")
-  item Item @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+
+model ItemCondition {
+  id             BigInt                        @id @default(autoincrement())
+  itemId         BigInt                        @map("item_id")
+  condition_key  item_conditions_condition_key
+  conditionValue String                        @map("condition_value")
+  item           Item                          @relation(fields: [itemId], references: [itemId])
+
+  @@index([itemId], map: "item_conditions_item_id_fkey")
   @@map("item_conditions")
 }
-model Item{
-  itemId Int @id @default(autoincrement()) @map("item_id")
-  categoryId Int @map("category_id")
-  itemLabel String @map("item_label")
-  clickCount Int @map("click_count")
-  itemCategory ItemCategory @relation(fields: [categoryId], references: [categoryId])
-  itemConditions ItemCondition[]
+
+model Item {
+  itemId         BigInt          @id @default(autoincrement()) @map("item_id")
+  categoryId     BigInt          @map("category_id")
+  itemLabel      String          @map("item_label")
   checklistItems ChecklistItem[]
-  itemReviews ItemReview[]
+  itemConditions ItemCondition[]
+  itemReviews    ItemReview[]
+  itemCategory   ItemCategory    @relation(fields: [categoryId], references: [categoryId])
+
+  @@index([categoryId], map: "items_category_id_fkey")
   @@map("items")
 }
-model ItemCategory{
-  categoryId Int @id @default(autoincrement()) @map("category_id")
-  categoryLabel String @unique @map("category_label")
-  items Item[]
+
+model ItemCategory {
+  categoryId    BigInt @id @default(autoincrement()) @map("category_id")
+  categoryLabel String @map("category_label")
+  items         Item[]
+
   @@map("item_category")
 }
-model ChecklistItem{
-  checklistItemId Int @id @default(autoincrement()) @map("checklist_item_id")
-  checklistId Int @map("checklist_id")
-  itemId Int @map("item_id")
-  removedByUser Boolean @default(false) @map("removed_by_user")
-  packingBag PackingBag @default(HOLD) @map("packing_bag")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
 
-  item Item @relation(fields: [itemId], references: [itemId])
-  checklist Checklist @relation(fields: [checklistId], references: [checklistId], onDelete: Cascade)
+model ChecklistItem {
+  id            BigInt    @id @default(autoincrement())
+  checklistId   BigInt    @map("checklist_id")
+  itemId        BigInt    @map("item_id")
+  added_by_user Boolean
+  removedByUser Boolean   @map("removed_by_user")
+  checklist     Checklist @relation(fields: [checklistId], references: [checklistId])
+  item          Item      @relation(fields: [itemId], references: [itemId])
+
+  @@index([checklistId], map: "checklist_items_checklist_id_fkey")
+  @@index([itemId], map: "checklist_items_item_id_fkey")
   @@map("checklist_items")
 }
-enum PackingBag {
-  HAND
-  HOLD
-}
-model Checklist{
-  checklistId Int @id @default(autoincrement()) @map("checklist_id")
-  userId Int @map("user_id")
-  title String @map("title")
-  travelType TravelType @default(ACTIVITY) @map("travel_type")
-  cityId Int @map("city_id")
-  travelStart DateTime @db.Date @map("travel_start")
-  travelEnd DateTime @db.Date @map("travel_end")
-  createdAt DateTime @default(now()) @map("created_at")
-  isShared Boolean @default(false) @map("is_shared")
-  likes Int @default(0) @map("likes")
-  content String? @map("content")
-  updatedAt DateTime @updatedAt @db.DateTime @map("updated_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
+
+model Checklist {
+  checklistId    BigInt                    @id @default(autoincrement()) @map("checklist_id")
+  userId         BigInt                    @map("user_id")
+  title          String                    @map("title")
+  travelType     checklists_travel_type    @map("travel_type")
+  transportation checklists_transportation
+  with_pet       Boolean
+  with_baby      Boolean
+  with_elderly   Boolean
+  visit_japan    Boolean
+  cityId         BigInt?                   @map("city_id")
+  travelStart    DateTime                  @map("travel_start") @db.Date
+  travelEnd      DateTime                  @map("travel_end") @db.Date
+  createdAt      DateTime                  @map("created_at") @db.DateTime(0)
+  isShared       Boolean                   @map("is_shared")
+  content        String                    @map("content") @db.Text
+  likes          BigInt                    @map("likes")
   checklistItems ChecklistItem[]
-  cities City @relation(fields: [cityId], references: [cityId])
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  itemReviews ItemReview[]
+  cities         City?                     @relation(fields: [cityId], references: [cityId])
+  user           User                      @relation(fields: [userId], references: [userId])
+
+  @@index([cityId], map: "checklists_city_id_fkey")
+  @@index([userId], map: "checklists_user_id_fkey")
   @@map("checklists")
 }
-enum TravelType{
-  ACTIVITY
-  RECREATION
-  EXPLORATION
-  BUSINESS
-}
-model User{
-  userId Int @id @default(autoincrement()) @map("user_id")
-  nickname String @unique @map("nickname")
-  email String @unique @map("email")
-  password String @map("password")
-  birthDate DateTime @db.Date @map("birth_date")
-  profilePhoto String? @map("profile_photo")
-  gender Gender @map("gender")
-  authority Authority @map("authority")
-  checklists Checklist[]
-  itemReviews ItemReview[]
-  favoriteItemReviews UserFavoriteItemReview[]
-  refresh_tokens refresh_tokens[]
+
+model User {
+  userId               BigInt                 @id @default(autoincrement()) @map("user_id")
+  nickname             String                 @unique @map("nickname")
+  email                String                 @unique @map("email")
+  password             String                 @map("password")
+  birthDate            DateTime               @map("birth_date") @db.Date
+  profilePhoto         String?                @map("profile_photo")
+  gender               users_gender?          @map("gender")
+  authority            Authority              @default(USER) @map("authority")
+  checklists           Checklist[]
+  itemReviews          ItemReview[]
+  refresh_tokens       refresh_tokens[]
+  user_favorite_item_r user_favorite_item_r[]
+
   @@map("users")
 }
 
 model refresh_tokens {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
   token      String   @unique
   expires_at DateTime
   created_at DateTime @default(now())
@@ -102,53 +107,87 @@ model refresh_tokens {
 
   @@index([user_id], map: "refresh_tokens_user_id_fkey")
 }
-enum Gender {
-  MALE
-  FEMALE
-  NONSPECIFIED
+
+model ItemReview {
+  reviewId             BigInt                 @id @default(autoincrement()) @map("review_id")
+  userId               BigInt                 @map("user_id")
+  title                String                 @map("title")
+  content              String                 @map("content") @db.Text
+  image                String?                @map("image")
+  likes                BigInt                 @map("likes")
+  createdAt            DateTime               @map("created_at") @db.Date
+  itemId               BigInt                 @map("item_id")
+  deletedAt            DateTime?              @map("deleted_at") @db.Date
+  item                 Item                   @relation(fields: [itemId], references: [itemId])
+  user                 User                   @relation(fields: [userId], references: [userId])
+  user_favorite_item_r user_favorite_item_r[]
+
+  @@index([itemId], map: "item_reviews_item_id_fkey")
+  @@index([userId], map: "item_reviews_user_id_fkey")
+  @@map("item_reviews")
 }
+
+model TravelTip {
+  id       BigInt @id @default(autoincrement())
+  title    String @map("title")
+  content  String @map("content") @db.Text
+  category String
+
+  @@map("travel_tips")
+}
+
+model City {
+  cityId    BigInt      @id @default(autoincrement()) @map("city_id")
+  cityName  String      @map("city_name")
+  checklist Checklist[]
+
+  @@map("cities")
+}
+
+model user_favorite_item_r {
+  id           BigInt     @id @default(autoincrement())
+  user_id      BigInt
+  review_id    BigInt
+  favorited_at DateTime   @db.Date
+  deleted_at   DateTime?  @db.Date
+  item_reviews ItemReview @relation(fields: [review_id], references: [reviewId])
+  users        User       @relation(fields: [user_id], references: [userId])
+
+  @@index([review_id], map: "user_favorite_item_r_review_id_fkey")
+  @@index([user_id], map: "user_favorite_item_r_user_id_fkey")
+}
+
 enum Authority {
   USER
   ADMIN
 }
-model ItemReview{
-  reviewId Int @id @default(autoincrement()) @map("review_id")
-  userId Int @map("user_id")
-  title String @map("title")
-  checklistId Int @map("checklist_id")
-  content String @db.Text @map("content")
-  image String? @map("image")
-  likes Int @default(0) @map("likes")
-  itemId Int @map("item_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
-  checklist Checklist @relation(fields: [checklistId], references: [checklistId])
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  item Item @relation(fields: [itemId], references: [itemId])
-  favoriteItemReviews UserFavoriteItemReview[]
-  @@map("item_reviews")
+
+enum item_conditions_condition_key {
+  NEW
+  USED
+  DAMAGED
 }
-model UserFavoriteItemReview{
-  favoriteId Int @id @default(autoincrement()) @map("favorite_id")
-  userId Int @map("user_id")
-  reviewId Int @map("review_id")
-  favoritedAt DateTime @default(now()) @map("favorited_at")
-  deletedAt DateTime? @db.DateTime @map("deleted_at")
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  itemReview ItemReview @relation(fields: [reviewId], references: [reviewId])
-  @@unique([userId, reviewId])
-  @@map("user_favorite_item_reviews")
+
+enum checklists_travel_type {
+  BUSINESS
+  LEISURE
+  ADVENTURE
 }
-model TravelTip{
-  tipId Int @id @default(autoincrement()) @map("tip_id")
-  title String @map("title")
-  content String @db.Text @map("content")
-  createdAt DateTime @default(now()) @map("created_at")
-  @@map("travel_tips")
+
+enum checklists_transportation {
+  CAR
+  PLANE
+  TRAIN
+  BUS
 }
-model City{
-  cityId Int @id @default(autoincrement()) @map("city_id")
-  cityName String @map("city_name")
-  checklist Checklist[]
-  @@map("cities")
+
+enum users_gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum PackingBag {
+  HAND
+  HOLD
 }

@@ -19,4 +19,7 @@ router.patch('/:reviewId', authenticateToken, itemReviewController.updateItemRev
 // 준비물 후기 삭제 (작성자 or 관리자)
 router.delete('/:reviewId', authenticateToken, itemReviewController.deleteItemReview);
 
+// 찜 많은 순으로 준비물 추천
+router.get('/top-liked', itemReviewController.getTopLikedReviewSummary);
+
 export default router;

@@ -7,7 +7,7 @@ class FavoriteItemReviewController {
 
 addFavorite = async (req: Request, res: Response, next: NextFunction) => {
   const userId: number = req.user!.userId;
-  const { reviewId } = req.body;
+  const reviewId = Number(req.params.reviewId);
 
   try {
     const result = await this.service.addFavorite(userId, reviewId);

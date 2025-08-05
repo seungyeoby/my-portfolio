@@ -7,7 +7,12 @@ class ItemReviewController {
 
 createItemReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, content, checklistId, itemId, userId } = req.body;
+    const { title, content, checklistId, itemId } = req.body;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: '권한 없음' });
+    }
+
     const image = req.file?.filename ?? null;
 
     const review = await this.service.createItemReview({
@@ -81,6 +86,15 @@ getAllItemReviews = async (req: Request, res: Response, next: NextFunction) => {
     next(new Error("deleteItemReviewError"));
   }
 }
-}
 
+getTopLikedReviewSummary = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await this.service.getTopLikedReviewSummary();
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+}
 export default new ItemReviewController();

@@ -139,4 +139,24 @@ export default class itemReviewRepository {
     });
   }
 
+  // 준비물 후기 찜 많은 순으로 5개 추천
+  async getTopLikedReviewSummary() {
+  return await prisma.itemReview.findMany({
+    where: { deletedAt: null },
+    orderBy: { likes: 'desc' },
+    take: 5,
+    select: {
+      likes: true,
+      item: {
+        select: {
+          itemCategory: {
+            select: {
+              categoryLabel: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
 }

@@ -19,7 +19,7 @@ export class TravelRepository {
   // ID로 여행정보 조회
   async findById(id: number) {
     return await prisma.travelTip.findUnique({
-      where: { id: BigInt(id) },
+      where: { id },
     });
   }
 
@@ -56,7 +56,7 @@ export class TravelRepository {
     }
 
     return await prisma.travelTip.update({
-      where: { id: BigInt(id) },
+      where: { id },
       data: updateData,
     });
   }
@@ -64,7 +64,7 @@ export class TravelRepository {
   // 여행정보 삭제
   async delete(id: number) {
     return await prisma.travelTip.delete({
-      where: { id: BigInt(id) },
+      where: { id },
     });
   }
 } 

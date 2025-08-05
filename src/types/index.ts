@@ -67,6 +67,31 @@ export interface ChangePasswordRequest {
   confirmPassword: string;
 }
 
+// 이메일 찾기 요청 타입
+export interface FindEmailRequest {
+  nickname: string;
+  birthDate: string;
+}
+
+// 이메일 찾기 응답 타입
+export interface FindEmailResponse {
+  message: string;
+  email: string;
+}
+
+// 비밀번호 재설정 요청 타입
+export interface ResetPasswordRequest {
+  email: string;
+  nickname: string;
+  birthDate: string;
+  newPassword: string;
+}
+
+// 로그아웃 응답 타입
+export interface LogoutResponse {
+  message: string;
+}
+
 // 여행 정보 관련 타입
 export interface TravelTip {
   id: number;

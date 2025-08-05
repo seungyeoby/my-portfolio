@@ -44,6 +44,18 @@ export const errorHandler = (
         message: "사용자를 찾을 수 없음" 
       });
 
+    case "PasswordError":
+      return res.status(401).json({ 
+        success: false, 
+        message: "비밀번호가 일치하지 않습니다" 
+      });
+
+    case "InputValidation":
+      return res.status(400).json({ 
+        success: false, 
+        message: "입력 정보를 확인해주세요" 
+      });
+
     // 데이터베이스 관련 에러
     case "DataBaseError":
       return res.status(500).json({ 
@@ -56,6 +68,24 @@ export const errorHandler = (
       return res.status(400).json({ 
         success: false, 
         message: "입력 정보를 확인해주세요" 
+      });
+
+    case "EmailAlreadyExists":
+      return res.status(409).json({ 
+        success: false, 
+        message: "이미 사용 중인 이메일입니다" 
+      });
+
+    case "NicknameAlreadyExists":
+      return res.status(409).json({ 
+        success: false, 
+        message: "이미 사용 중인 닉네임입니다" 
+      });
+
+    case "UserInfoNotFound":
+      return res.status(404).json({ 
+        success: false, 
+        message: "사용자 정보를 찾을 수 없습니다" 
       });
 
     // 토큰 관련 에러

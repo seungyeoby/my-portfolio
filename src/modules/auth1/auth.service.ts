@@ -42,21 +42,30 @@ export default class AuthService {
     await this.userRepo.createUser(signUpUserInfo);
   }
 
-  async signIn(userInfo: SignInInfo) {
-    const user = await this.userRepo.findByEmail(userInfo.email);
+ async signIn(userInfo: SignInInfo) {
+  const user = await this.userRepo.findByEmail(userInfo.email);
+  if (!user) {
+    console.log("❌ 사용자 없음:", userInfo.email);
+    throw new Error("UserNotFound");
+  }
 
-    if (!user) {
-      throw new Error("UserNotFound");
-    }
+  console.log("✅ 사용자 존재:", user.email);
+  console.log("입력한 비밀번호:", userInfo.password);
+  console.log("DB 저장된 해시:", user.password);
 
-    const isPasswordVerified = await bcrypt.compare(
-      userInfo.password,
-      user.password
-    );
+  const isPasswordVerified = await bcrypt.compare(
+    userInfo.password,
+    user.password
+  );
 
-    if (!isPasswordVerified) {
-      throw new Error("PasswordError");
-    }
+  if (!isPasswordVerified) {
+    console.log("❌ 비밀번호 불일치");
+    throw new Error("PasswordError");
+  }
+
+  console.log("✅ 로그인 성공");
+
+
 
     const publicUserInfo: PublicUserInfo = {
       email: user.email,
