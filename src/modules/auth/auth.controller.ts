@@ -31,13 +31,13 @@ class AuthController {
     const { publicUserInfo, token } = await this.authService.signIn(userInfo);
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "none",
       maxAge: 1000 * 60 * 60 * 12,
       path:"/"
     });
     return res.status(200).json({
-      data: { publicUserInfo },
+      data: { publicUserInfo , token },
     });
   };
 
