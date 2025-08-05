@@ -35,9 +35,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  origin: "http://localhost:5173", // 프론트 주소
   credentials: true,
-}));
+  allowedHeaders: ["Content-Type", "Authorization"], // :흰색_확인_표시: Authorization 추가
+}))
 
 // 정적 파일 서빙 (업로드된 파일들)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));

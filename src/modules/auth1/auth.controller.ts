@@ -25,10 +25,8 @@ class AuthController {
   signIn = async (req: Request, res: Response) => {
     const userInfo: SignInInfo = req.body;
     const { publicUserInfo, token } = await this.authService.signIn(userInfo);
-    return res.status(200).json({ 
-      success: true,
-      message: "로그인 성공",
-      data: { publicUserInfo, token } 
+    return res.status(200).json({
+      data: { publicUserInfo, token },
     });
   };
 

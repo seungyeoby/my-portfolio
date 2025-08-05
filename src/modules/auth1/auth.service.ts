@@ -79,6 +79,7 @@ export default class AuthService {
     const token = jwt.sign(
       {
         userId: user.userId,
+        nickname: user.nickname,
       },
       process.env.SECRET_KEY!,
       {
