@@ -50,7 +50,6 @@ export const signupValidation = [
 export const signinValidation = [
   body("email").isEmail().withMessage("유효한 이메일 주소를 입력해주세요"),
   body("password").notEmpty().withMessage("비밀번호를 입력해주세요"),
-  handleValidationResult,
 ];
 
 export const findIdValidation = [
