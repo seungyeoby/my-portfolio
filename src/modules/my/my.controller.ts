@@ -104,7 +104,8 @@ class UserController {
 
   // 체크리스트 생성
   createChecklist = async (req: Request, res: Response) => {
-    const checklist: Checklist = req.body;
+    const userId: number = req.user!.userId;
+    const checklist: Checklist = { userId, ...req.body };
     await this.userService.createChecklist(checklist);
     return res.status(201).send({
       message: "체크리스트 생성 완료",

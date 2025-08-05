@@ -41,12 +41,16 @@ class AuthController {
   };
 
   // 로그아웃
-  signOut = async (req: Request, res: Response): Promise<void> => {
-    // 실제 구현에서는 토큰 블랙리스트나 세션 관리가 필요할 수 있음
-    const response: LogoutResponse = {
-      message: "로그아웃이 완료되었습니다",
-    };
-    res.status(200).json(response);
+  signOut = async (req: Request, res: Response) => {
+    res.cookie("accessToken", "", {
+      httpOnly: true,
+      secure: true, // HTTPS 환경일 경우
+      sameSite: "strict",
+      expires: new Date(0), // 과거 날짜 → 즉시 만료
+    });
+    return res.status(200).json({
+      message: "로그아웃",
+    });
   };
 
   // 이메일 찾기
