@@ -54,6 +54,12 @@ class AuthController {
     });
   };
 
+  isLogged = async (req: Request, res: Response) => {
+    const userId: number = req.user!.userId;
+    const nickname = await this.authService.getUserNickname(userId);
+    return res.status(200).send(nickname);
+  };
+
   // 이메일 찾기
   findId = async (req: Request, res: Response): Promise<void> => {
     const { nickname, birthDate }: FindEmailRequest = req.body;
