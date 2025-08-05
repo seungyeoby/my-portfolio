@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { UserRepository } from "../../repositories/user.repository.js";
 import { RefreshTokenService } from "../../services/refreshTokenService.js";
 import { Checklist, ChangedChecklistItems } from "../../types/checklist.js";
-import { UpdatedUserInfo } from "../../types/publicUserInfo.js";
+import { UpdatedUserInfo } from "../../types/user.js";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -28,10 +28,7 @@ export class UserService {
       updatedInfo.birthDate = new Date(updatedInfo.birthDate);
     }
 
-    const updatedUser = await this.userRepository.update(
-      userId,
-      updatedInfo
-    );
+    const updatedUser = await this.userRepository.update(userId, updatedInfo);
     return updatedUser;
   }
 
@@ -104,4 +101,4 @@ export class UserService {
     // 사용자 삭제 (CASCADE로 인해 관련 데이터도 함께 삭제됨)
     await this.userRepository.delete(userId);
   }
-} 
+}

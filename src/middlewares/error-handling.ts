@@ -9,6 +9,10 @@ export default function (
   switch (err.message) {
     case "UserNotFound":
       return res.status(404).send({ message: "사용자를 찾을 수 없음" });
+    case "PasswordError":
+      return res.status(400).send({
+        errorMessage: "일치하지 않는 비밀번호",
+      });
     case "ChecklistNotFound":
       return res.status(404).send({ message: "체크리스트를 찾을 수 없음" });
     case "ReviewNotFound":
@@ -61,6 +65,10 @@ export default function (
       return res.status(500).json({ message: "체크리스트 공유 해제 실패" });
     case "Forbidden":
       return res.status(403).json({ message: "권한이 없습니다." });
+    case "EmailAlreadyExists":
+      return res.status(409).json({ message: "이미 사용 중인 이메일입니다." });
+    case "NicknameAlreadyExists":
+      return res.status(409).json({ message: "이미 사용 중인 닉네임입니다." });
     default:
       return res.status(500).json({ message: "서버 오류" });
   }

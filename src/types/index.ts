@@ -6,7 +6,7 @@ export interface User {
   nickname: string;
   email: string;
   birthDate: Date;
-  gender?: "MALE" | "FEMALE" | "OTHER";
+  gender?: "MALE" | "FEMALE" | "NONSPECIFIED";
   profilePhoto?: string;
   authority: "USER" | "ADMIN";
 }
@@ -116,4 +116,4 @@ export interface ValidationError {
   msg: string;
   path: string;
   location: string;
-} 
+}
