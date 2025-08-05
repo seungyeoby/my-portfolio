@@ -7,5 +7,4 @@ export type Items = {
 export type Item = {
   itemId: number;
   itemLabel: string;
-  clickCount: number;
 };
