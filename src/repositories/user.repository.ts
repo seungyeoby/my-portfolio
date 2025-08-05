@@ -67,33 +67,33 @@ export default class UserRepository {
     });
   }
 
-  // // 닉네임과 생년월일로 사용자 찾기
-  // async findByNicknameAndBirth(nickname: string, birthDate: Date) {
-  //   return await prisma.user.findFirst({
-  //     where: {
-  //       nickname,
-  //       birthDate,
-  //     },
-  //     select: {
-  //       email: true,
-  //     },
-  //   });
-  // }
+  // 닉네임과 생년월일로 사용자 찾기
+  async findByNicknameAndBirth(nickname: string, birthDate: Date) {
+    return await prisma.user.findFirst({
+      where: {
+        nickname,
+        birthDate,
+      },
+      select: {
+        email: true,
+      },
+    });
+  }
 
-  // // 이메일, 닉네임, 생년월일로 사용자 찾기
-  // async findByEmailNicknameAndBirth(
-  //   email: string,
-  //   nickname: string,
-  //   birthDate: Date
-  // ) {
-  //   return await prisma.user.findUnique({
-  //     where: {
-  //       email,
-  //       nickname,
-  //       birthDate,
-  //     },
-  //   });
-  // }
+  // 이메일, 닉네임, 생년월일로 사용자 찾기
+  async findByEmailNicknameAndBirth(
+    email: string,
+    nickname: string,
+    birthDate: Date
+  ) {
+    return await prisma.user.findFirst({
+      where: {
+        email,
+        nickname,
+        birthDate,
+      },
+    });
+  }
 
   // // 사용자 생성
   // async create(userData: {
@@ -146,13 +146,13 @@ export default class UserRepository {
   //   });
   // }
 
-  // // 비밀번호 업데이트
-  // async updatePassword(userId: number, hashedPassword: string) {
-  //   return await prisma.user.update({
-  //     where: { userId: BigInt(userId) },
-  //     data: { password: hashedPassword },
-  //   });
-  // }
+  // 비밀번호 업데이트
+  async updatePassword(userId: number, hashedPassword: string) {
+    return await prisma.user.update({
+      where: { userId },
+      data: { password: hashedPassword },
+    });
+  }
 
   // // 사용자 삭제
   // async delete(userId: number) {
