@@ -44,6 +44,13 @@ export default class UserRepository {
     });
   }
 
+  async getUserNickname(userId: number) {
+    return await prisma.user.findFirst({
+      where: { userId },
+      select: { nickname: true },
+    });
+  }
+
   // // ID로 사용자 찾기
   // async findById(userId: number) {
   //   return await prisma.user.findUnique({
