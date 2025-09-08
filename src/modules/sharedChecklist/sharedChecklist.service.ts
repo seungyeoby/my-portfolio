@@ -6,8 +6,8 @@ export default class SharedChecklistService {
   async getAllSharedChecklists(sort: string) {
     try {
       return await this.repo.getAllSharedChecklists(sort);
-    } catch (error) {
-      throw new Error("DataBaseError");
+    } catch {
+      throw new Error('DataBaseError');
     }
   }
 
@@ -16,8 +16,9 @@ export default class SharedChecklistService {
       const checklist = await this.repo.getSharedChecklistById(checklistId);
       if (!checklist) throw new Error('ChecklistNotFound');
       return checklist;
-    } catch (error) {
-      throw new Error("DataBaseError");
+    } catch (error: any) {
+      if (error?.message === 'ChecklistNotFound') throw error;
+      throw new Error('DataBaseError');
     }
   }
 
@@ -33,8 +34,10 @@ export default class SharedChecklistService {
       if (!isOwner && !isAdmin) throw new Error('AuthenticationError');
 
       return await this.repo.shareChecklist(checklistId);
-    } catch (error) {
-      throw new Error("DataBaseError");
+    } catch (error: any) {
+      const pass = ['ChecklistNotFound','DeleteChecklistError','AlreadyShared','AuthenticationError'];
+      if (pass.includes(error?.message)) throw error;
+      throw new Error('DataBaseError');
     }
   }
 
@@ -50,8 +53,18 @@ export default class SharedChecklistService {
       if (!isOwner && !isAdmin) throw new Error('AuthenticationError');
 
       return await this.repo.unshareChecklist(checklistId);
-    } catch (error) {
-      throw new Error("DataBaseError");
+    } catch (error: any) {
+      const pass = ['ChecklistNotFound','DeleteChecklistError','AlreadyShared','AlreadyUnshared','AuthenticationError'];
+      if (pass.includes(error?.message)) throw error;
+      throw new Error('DataBaseError');
+    }
+  }
+
+  async getMine(userId: number) {
+    try {
+      return await this.repo.getSharedChecklistsByUserId(userId);
+    } catch {
+      throw new Error('DataBaseError');
     }
   }
 }

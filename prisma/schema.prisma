@@ -5,12 +5,15 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model ItemCondition{
-  itemConditionId Int @id @default(autoincrement()) @map("item_condition_id")
-  itemId Int @map("item_id")
-  conditionValue String @map("condition_value")
-  item Item @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
-  @@map("item_conditions")
+model ItemCondition {
+  itemConditionId Int    @id @default(autoincrement()) @map("item_condition_id")
+  itemId          Int    @map("item_id")
+  conditionValue  String @map("condition_value")
+  item            Item   @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+
+  @@map("item_condition")  // ✅ 실제 테이블명에 맞추기 (단수!)
+  @@index([itemId])
+  @@index([conditionValue])
 }
 model Item{
   itemId Int @id @default(autoincrement()) @map("item_id")

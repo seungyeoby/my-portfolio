@@ -15,7 +15,10 @@ export const authenticateToken = (
 ) => {
   const token = req.cookies.accessToken;
 
+console.log("aasdasdsaddadadadsddddad", token)
+
   if (!token) {
+
     return res.status(401).json({
       success: false,
       message: "액세스 토큰이 필요합니다",

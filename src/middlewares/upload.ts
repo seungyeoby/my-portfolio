@@ -1,103 +1,77 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 
-// 업로드 디렉토리 생성
-const uploadDir = "uploads";
-const profileDir = path.join(uploadDir, "profiles");
-const itemImageDir = path.join(uploadDir, "item-images");
+// ── 절대 경로 고정(ESM 안전)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// <server-root> 기준으로 uploads 폴더 고정
+const ROOT_DIR = path.resolve(__dirname, "..", ".."); // 서버 루트 추정
+const UPLOAD_ROOT = path.join(ROOT_DIR, "uploads");
+const PROFILE_DIR = path.join(UPLOAD_ROOT, "profiles");
+const ITEM_IMAGE_DIR = path.join(UPLOAD_ROOT, "item-images"); // 하이픈 유지
 
-// 디렉토리가 없으면 생성
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-if (!fs.existsSync(profileDir)) {
-  fs.mkdirSync(profileDir, { recursive: true });
-}
+// ── 폴더 보장
+fs.mkdirSync(PROFILE_DIR, { recursive: true });
+fs.mkdirSync(ITEM_IMAGE_DIR, { recursive: true });
 
-if (!fs.existsSync(itemImageDir)) {
-  fs.mkdirSync(itemImageDir, { recursive: true });
-}
-
-// 파일 저장 설정
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, profileDir);
-  },
-  filename: (req, file, cb) => {
-    // 파일명: timestamp_originalname
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `profile_${uniqueSuffix}${ext}`);
-  },
-});
-
-// 파일 필터링
-const fileFilter = (
-  req: any,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback
-) => {
-  // 허용할 파일 타입
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(
-      new Error(
-        "지원하지 않는 파일 형식입니다. JPG, PNG, GIF만 업로드 가능합니다."
-      )
-    );
-  }
+// ── 공통 파일 필터
+const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
+  const allowed = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+  if (allowed.includes(file.mimetype)) return cb(null, true);
+  return cb(new Error("지원하지 않는 파일 형식입니다. JPG/PNG/GIF만 업로드 가능합니다."));
 };
 
-// multer 설정
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB 제한
+// ── 프로필 업로드(storage)
+const profileStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, PROFILE_DIR),
+  filename: (_req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `profile_${uniqueSuffix}${ext}`); // ← 백틱 사용
   },
 });
 
-// 프로필 사진 업로드 미들웨어
-export const uploadProfilePhoto = upload.single("profilePhoto");
+const profileUpload = multer({
+  storage: profileStorage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
-// 파일 삭제 함수
+export const uploadProfilePhoto = profileUpload.single("profilePhoto");
+
+// ── 프로필 파일 삭제/경로 유틸
 export const deleteFile = (filename: string) => {
-  const filePath = path.join(profileDir, filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
+  const filePath = path.join(PROFILE_DIR, filename);
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 };
 
-// 파일 경로 생성 함수
-export const getProfilePhotoPath = (filename: string) => {
-  if (!filename) return null;
-  return `/uploads/profiles/${filename}`;
-};
+export const getProfilePhotoPath = (filename?: string | null) =>
+  filename ? `/uploads/profiles/${filename}` : null;
 
-// 기본 프로필 이미지 경로 반환 함수
-export const getDefaultProfilePhoto = () => {
-  return "/images/default-profile.svg";
-};
+export const getDefaultProfilePhoto = () => "/images/default-profile.svg";
 
-// 아이템 이미지용 storage 설정
+// ── 아이템 이미지 업로드(storage)
 const itemImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, itemImageDir);
-  },
-  filename: (req, file, cb) => {
+  destination: (_req, _file, cb) => cb(null, ITEM_IMAGE_DIR),
+  filename: (_req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `item_${uniqueSuffix}${ext}`);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `item_${uniqueSuffix}${ext}`); // ← 백틱 사용
   },
 });
 
-// 아이템 이미지 업로드 설정
-export const uploadItemImage = multer({
+const itemImageUpload = multer({
   storage: itemImageStorage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
-}).single("image");
+});
+
+export const uploadItemImage = itemImageUpload.single("image"); // ← 필드명 "image"
+
+export const getItemImagePath = (filename?: string | null) =>
+  filename ? `/uploads/item-images/${filename}` : null;
+
+
+

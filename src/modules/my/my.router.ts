@@ -1,3 +1,4 @@
+// src/modules/my/my.router.ts
 import { Router } from "express";
 import { uploadProfilePhoto } from "../../middlewares/upload.js";
 import userController from "./my.controller.js";
@@ -8,15 +9,13 @@ import {
   handleValidationResult,
 } from "../../middlewares/validation.js";
 import { asyncHandler } from "../../middlewares/errorHandler.js";
+// ✅ 추가: 공유 컨트롤러 (내가 공유한 목록 전용)
+import sharedChecklistController from "../sharedChecklist/sharedChecklist.controller.js";
 
 const router: Router = Router();
 
 // 개인정보 조회
-router.get(
-  "/",
-  authenticateToken,
-  asyncHandler(userController.getPersonalInfo)
-);
+router.get("/", authenticateToken, asyncHandler(userController.getPersonalInfo));
 
 // 개인정보 수정
 router.patch(
@@ -42,14 +41,14 @@ router.get(
   asyncHandler(userController.getReviewByReviewId)
 );
 
-// 내가 공유한 체크리스트 전체 조회
+// ✅ 내가 공유한 체크리스트 전체 조회 (sharedChecklistController.getMine 사용)
 router.get(
   "/shared-checklists",
   authenticateToken,
-  asyncHandler(userController.getSharedChecklists)
+  asyncHandler(sharedChecklistController.getMine)
 );
 
-// 내가 공유한 개별 체크리스트 조회
+// 내가 공유한 개별 체크리스트 조회 (본인 체크 필요 시 userController 로직 유지)
 router.get(
   "/shared-checklists/:checklistId",
   authenticateToken,

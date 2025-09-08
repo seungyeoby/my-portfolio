@@ -1,19 +1,17 @@
 import RecommendationService from "./recommendation.service.js";
-import { Answer, RecommendedItems } from "../../types/answer.js";
 import { Request, Response } from "express";
 
 class RecommendationController {
-  private recommendationService: RecommendationService;
-
-  constructor() {
-    this.recommendationService = new RecommendationService();
-  }
+  private recommendationService = new RecommendationService();
 
   getRecommendedItems = async (req: Request, res: Response) => {
-    const answer: Answer = req.body;
-    const recommendedItems: RecommendedItems =
-      await this.recommendationService.getRecommendedItemIds(answer);
-    return res.status(200).send(recommendedItems);
+    try {
+      const recommended = await this.recommendationService.getRecommendedItemIds(req.body);
+      return res.status(200).json(recommended);
+    } catch (e: any) {
+      console.error("[recommend] error:", e);
+      return res.status(500).json({ message: e?.message ?? "Internal Server Error" });
+    }
   };
 }
 
